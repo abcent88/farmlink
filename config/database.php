@@ -1,20 +1,75 @@
 <?php
 
-$host = "localhost";
-$dbname = "farmlink_db";
-$username = "farmlink_user";
-$password = "Esapret91@";
+require_once
+__DIR__
+.'/../includes/env.php';
 
-try {
-    $pdo = new PDO(
-        "mysql:host=$host;dbname=$dbname;charset=utf8",
-        $username,
-        $password
-    );
+require_once
+__DIR__
+.'/../includes/error_handler.php';
 
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-} catch(PDOException $e) {
-    die("Connection Failed: " . $e->getMessage());
+loadEnv(
+__DIR__
+.'/../.env'
+);
+
+
+$host=
+$_ENV['DB_HOST']
+?? 'localhost';
+
+$dbname=
+$_ENV['DB_NAME']
+?? '';
+
+$user=
+$_ENV['DB_USER']
+?? '';
+
+$password=
+$_ENV['DB_PASS']
+?? '';
+
+
+try{
+
+$pdo=
+new PDO(
+
+"mysql:host=$host;dbname=$dbname;charset=utf8mb4",
+
+$user,
+
+$password
+
+);
+
+$pdo->setAttribute(
+
+PDO::ATTR_ERRMODE,
+
+PDO::ERRMODE_EXCEPTION
+
+);
+
+$pdo->setAttribute(
+
+PDO::ATTR_DEFAULT_FETCH_MODE,
+
+PDO::FETCH_ASSOC
+
+);
+
+}catch(
+PDOException $e
+){
+
+appError(
+$e->getMessage()
+);
+
+appFail();
+
 }
 ?>

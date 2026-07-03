@@ -40,7 +40,11 @@ $stmt->execute([$orderId]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
-    die('Order not found');
+    appError(
+$e->getMessage()
+);
+
+appFail();
 }
 
 $totalValue = $order['quantity'] * $order['price'];

@@ -1,0 +1,10 @@
+.env
+.env.save
+logs/
+/vendor
+
+/backups
+
+/uploads
+
+*.sql

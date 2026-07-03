@@ -1,133 +1,285 @@
 <?php
 
-session_start();
+require_once 'includes/auth.php';
 
 require_once 'config/database.php';
 
-$message = '';
+require_once 'includes/logger.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+$message='';
 
-    $sql = "SELECT * FROM users WHERE email = :email";
 
-    $stmt = $pdo->prepare($sql);
+if(
+$_SERVER['REQUEST_METHOD']==='POST'
+){
 
-    $stmt->execute([
-        ':email' => $email
-    ]);
+$email=
+trim(
+$_POST['email']
+);
 
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user) {
+$password=
+$_POST['password'];
 
-        if ($user['status'] != 'active') {
 
-            $message = "Account awaiting approval.";
+$stmt=
+$pdo->prepare(
 
-        } elseif (password_verify($password, $user['password'])) {
+"
 
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['fullname'] = $user['fullname'];
-            $_SESSION['role'] = $user['role'];
+SELECT *
 
-            switch ($user['role']) {
+FROM users
+
+WHERE email=?
+
+LIMIT 1
+
+"
+
+);
+
+
+$stmt->execute([
+$email
+]);
+
+
+$user=
+$stmt->fetch();
+
+
+if($user){
+
+if(
+$user['status']!=='active'
+){
+
+$message=
+'Account awaiting approval.';
+
+
+}elseif(
+password_verify(
+$password,
+$user['password']
+)
+){
+
+session_regenerate_id(
+true
+);
+
+
+$_SESSION['user_id']=
+$user['id'];
+
+$_SESSION['fullname']=
+$user['fullname'];
+
+$_SESSION['role']=
+$user['role'];
+
+
+/*
+Log activity BEFORE redirect
+*/
+
+logActivity(
+
+$pdo,
+
+$user['id'],
+
+'Login',
+
+'User signed into FarmLink'
+
+);
+
+
+$redirect='index.php';
+
+
+switch(
+$user['role']
+){
 
 case 'super_admin':
-    header("Location: admin/dashboard.php");
-    exit;
+
+$redirect=
+'admin/dashboard.php';
+
+break;
+
 
 case 'lga_admin':
-    header("Location: admin/lga_admin/lga_admin_dashboard.php");
-    exit;
+
+$redirect=
+'admin/lga_admin/lga_admin_dashboard.php';
+
+break;
+
 
 case 'farmer':
-    header("Location: farmer/dashboard.php");
-    exit;
+
+$redirect=
+'farmer/dashboard.php';
+
+break;
+
 
 case 'buyer':
-    header("Location: buyer/dashboard.php");
-    exit;
+
+$redirect=
+'buyer/dashboard.php';
+
+break;
+
 
 case 'trucker':
-    header("Location: trucker/dashboard.php");
-    exit;
+
+$redirect=
+'trucker/dashboard.php';
+
+break;
+
+
+case 'investor':
+
+$redirect=
+'investor/dashboard.php';
+
+break;
 
 }
 
-        } else {
 
-            $message = "Invalid password";
+header(
+"Location: $redirect"
+);
 
-        }
+exit;
 
-    } else {
 
-        $message = "User not found";
+}else{
 
-    }
+$message=
+'Invalid password';
+
 }
+
+
+}else{
+
+$message=
+'User not found';
+
+}
+
+}
+
 ?>
 
 <?php include 'includes/header.php'; ?>
+
 <?php include 'includes/navbar.php'; ?>
 
 <div class="container mt-5">
 
-    <div class="row justify-content-center">
+<div class="row justify-content-center">
 
-        <div class="col-md-5">
+<div class="col-md-5">
 
-            <div class="card shadow">
+<div class="card shadow">
 
-                <div class="card-header bg-success text-white">
-                    <h3>Login</h3>
-                </div>
+<div class="card-header bg-success text-white">
 
-                <div class="card-body">
+<h3>
 
-                    <?php if(!empty($message)): ?>
-                        <div class="alert alert-warning">
-                            <?= $message ?>
-                        </div>
-                    <?php endif; ?>
+Login
 
-                    <form method="POST">
+</h3>
 
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <input type="email"
-                                   name="email"
-                                   class="form-control"
-                                   required>
-                        </div>
+</div>
 
-                        <div class="mb-3">
-                            <label>Password</label>
-                            <input type="password"
-                                   name="password"
-                                   class="form-control"
-                                   required>
-                        </div>
+<div class="card-body">
 
-                        <button type="submit"
-                                class="btn btn-success w-100">
+<?php if($message): ?>
 
-                            Login
+<div class="alert alert-warning">
 
-                        </button>
+<?= htmlspecialchars(
+$message
+) ?>
 
-                    </form>
+</div>
 
-                </div>
+<?php endif; ?>
 
-            </div>
+<form method="POST">
 
-        </div>
+<div class="mb-3">
 
-    </div>
+<label>
+
+Email
+
+</label>
+
+<input
+type="email"
+name="email"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Password
+
+</label>
+
+<input
+type="password"
+name="password"
+class="form-control"
+required>
+
+</div>
+
+<button
+type="submit"
+class="btn btn-success w-100">
+
+Login
+
+</button>
+
+<div class="mt-3">
+
+<a href="forgot_password.php">
+
+Forgot Password?
+
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 

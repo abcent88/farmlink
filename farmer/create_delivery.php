@@ -9,7 +9,11 @@ requireRole('farmer');
 $orderId = (int)($_GET['order_id'] ?? 0);
 
 if (!$orderId) {
-    die('Invalid Order');
+    appError(
+$e->getMessage()
+);
+
+appFail();
 }
 
 /*
@@ -35,11 +39,19 @@ $stmt->execute([$orderId]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
-    die('Order not found');
+    appError(
+$e->getMessage()
+);
+
+appFail();
 }
 
 if ($order['status'] !== 'accepted') {
-    die('Order must be approved by LGA before assigning truck.');
+   appError(
+$e->getMessage()
+);
+
+appFail('Order must be approved by LGA before assigning truck.');
 }
 
 /*

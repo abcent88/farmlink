@@ -2,11 +2,15 @@
 
 function requireRole($role)
 {
-    if (!isset($_SESSION['role'])) {
-        die("Access Denied");
-    }
+    if (
+        !isset($_SESSION['role']) ||
+        $_SESSION['role'] !== $role
+    ) {
 
-    if ($_SESSION['role'] !== $role) {
-        die("Access Denied");
+        header("Location: /projects/farmlink/login.php");
+
+        exit;
     }
 }
+
+?>

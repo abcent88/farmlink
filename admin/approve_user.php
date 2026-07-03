@@ -4,6 +4,8 @@ require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/csrf.php';
 require_once '../includes/audit.php';
+require_once '../includes/notify.php';
+
 
 verify_csrf();
 
@@ -14,6 +16,18 @@ $stmt = $pdo->prepare("
     SET status='active'
     WHERE id=?
 ");
+notify(
+
+$pdo,
+
+$userId,
+
+'Account Approved',
+
+'Your FarmLink account has been approved. You can now login.'
+
+);
+
 
 $stmt->execute([$id]);
 

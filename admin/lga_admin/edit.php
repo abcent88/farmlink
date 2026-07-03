@@ -20,7 +20,9 @@ $stmt->execute([$id]);
 $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$admin) {
-    die("LGA Admin not found.");
+    appFail(
+"Profile not found."
+);
 }
 
 $message = '';

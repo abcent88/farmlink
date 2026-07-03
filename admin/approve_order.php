@@ -3,6 +3,8 @@
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
+require_once '../includes/notify.php';
+
 
 requireRole('lga_admin');
 
@@ -76,6 +78,18 @@ $update = $pdo->prepare("
     SET status='accepted'
     WHERE id = ?
 ");
+notify(
+
+$pdo,
+
+$buyerId,
+
+'Order Accepted',
+
+'Your order has been accepted.'
+
+);
+
 
 $update->execute([$orderId]);
 

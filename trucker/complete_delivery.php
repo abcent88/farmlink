@@ -3,6 +3,8 @@
 require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
+require_once '../includes/notify.php';
+
 
 requireRole('trucker');
 
@@ -19,7 +21,11 @@ $stmt->execute([$id]);
 $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$delivery) {
-    die('Delivery not found');
+    appError(
+$e->getMessage()
+);
+
+appFail();
 }
 
 $orderId = $delivery['order_id'];
@@ -37,7 +43,11 @@ $stmt->execute([$orderId]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
-    die('Order not found');
+    appError(
+$e->getMessage()
+);
+
+appFail('Order not found');
 }
 
 /*
@@ -51,6 +61,17 @@ $stmt = $pdo->prepare("
     SET status = 'completed'
     WHERE id = ?
 ");
+notify(
+
+$pdo,
+
+$buyerId,
+
+'Order Completed',
+
+'Your order was completed successfully.'
+
+);
 
 $stmt->execute([$id]);
 

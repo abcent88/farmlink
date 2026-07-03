@@ -6,217 +6,489 @@ require_once '../includes/roles.php';
 
 requireRole('farmer');
 
-$message = '';
+$message='';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $product_name = trim($_POST['product_name']);
-    $category     = trim($_POST['category']);
-    $quantity     = $_POST['quantity'];
-    $unit         = trim($_POST['unit']);
-    $price        = $_POST['price'];
-    $description  = trim($_POST['description']);
+if($_SERVER['REQUEST_METHOD']==='POST'){
 
-    $imageName = null;
+$product_name=
+trim($_POST['product_name']);
 
-    if (!empty($_FILES['image']['name'])) {
+$category=
+trim($_POST['category']);
 
-        $allowed = [
-            'image/jpeg',
-            'image/png',
-            'image/webp'
-        ];
+$quantity=
+$_POST['quantity'];
 
-        if (
-            !in_array(
-                $_FILES['image']['type'],
-                $allowed
-            )
-        ) {
-            die('Invalid file type');
-        }
+$unit=
+trim($_POST['unit']);
 
-        $imageName =
-            time() . '_' .
-            basename($_FILES['image']['name']);
+$price=
+$_POST['price'];
 
-        move_uploaded_file(
-            $_FILES['image']['tmp_name'],
-            '../uploads/products/' . $imageName
-        );
-    }
+$description=
+trim($_POST['description']);
 
-    $stmt = $pdo->prepare("
-        INSERT INTO products
-        (
-            farmer_id,
-            product_name,
-            category,
-            quantity,
-            unit,
-            price,
-            description,
-            image
-        )
-        VALUES
-        (
-            ?, ?, ?, ?, ?, ?, ?, ?
-        )
-    ");
+$imageName=null;
 
-    $stmt->execute([
-        $_SESSION['user_id'],
-        $product_name,
-        $category,
-        $quantity,
-        $unit,
-        $price,
-        $description,
-        $imageName
-    ]);
 
-    $message =
-        'Product submitted successfully and awaiting approval.';
+/*
+UPLOAD SECURITY
+*/
+
+if(
+
+isset($_FILES['image'])
+
+&&
+
+$_FILES['image']['error']
+!==4
+
+){
+
+if(
+
+$_FILES['image']['error']
+!==0
+
+){
+
+appFail(
+'Upload failed.'
+);
+
 }
 
+
+if(
+
+$_FILES['image']['size']
+
+>
+
+5*1024*1024
+
+){
+
+appFail(
+'Image must not exceed 5MB.'
+);
+
+}
+
+
+$allowed=[
+
+'image/jpeg',
+
+'image/png',
+
+'image/webp'
+
+];
+
+
+$type=
+
+mime_content_type(
+
+$_FILES['image']['tmp_name']
+
+);
+
+
+if(
+
+!in_array(
+$type,
+$allowed
+)
+
+){
+
+appFail(
+'Only JPG, PNG and WEBP images are allowed.'
+);
+
+}
+
+
+$uploadDir=
+'../uploads/products/';
+
+
+if(
+
+!is_dir(
+$uploadDir
+)
+
+){
+
+mkdir(
+
+$uploadDir,
+
+0775,
+
+true
+
+);
+
+}
+
+
+$extension=
+
+pathinfo(
+
+$_FILES['image']['name'],
+
+PATHINFO_EXTENSION
+
+);
+
+
+$imageName=
+
+uniqid()
+
+.
+
+'_'
+
+.
+
+time()
+
+.
+
+'.'
+
+.
+
+$extension;
+
+
+if(
+
+!move_uploaded_file(
+
+$_FILES['image']['tmp_name'],
+
+$uploadDir.$imageName
+
+)
+
+){
+
+appFail(
+'Could not upload image.'
+);
+
+}
+
+}
+
+
+try{
+
+$stmt=
+$pdo->prepare(
+
+"
+
+INSERT INTO products
+(
+
+farmer_id,
+
+product_name,
+
+category,
+
+quantity,
+
+unit,
+
+price,
+
+description,
+
+image
+
+)
+
+VALUES
+(
+
+?,
+
+?,
+
+?,
+
+?,
+
+?,
+
+?,
+
+?,
+
+?
+
+)
+
+"
+
+);
+
+
+$stmt->execute([
+
+$_SESSION['user_id'],
+
+$product_name,
+
+$category,
+
+$quantity,
+
+$unit,
+
+$price,
+
+$description,
+
+$imageName
+
+]);
+
+
+$message=
+'Product submitted successfully and awaiting approval.';
+
+
+}catch(
+PDOException $e
+){
+
+appError(
+$e->getMessage()
+);
+
+appFail();
+
+}
+
+}
+
+
 include '../includes/header.php';
+
 include '../includes/navbar.php';
+
 ?>
 
 <div class="container mt-5">
 
-    <div class="row justify-content-center">
+<div class="row justify-content-center">
 
-        <div class="col-md-8">
+<div class="col-md-8">
 
-            <div class="card shadow">
+<div class="card shadow">
 
-                <div class="card-header bg-success text-white">
+<div class="card-header bg-success text-white">
 
-                    <h3>Add Product</h3>
+<h3>
 
-                </div>
+Add Product
 
-                <div class="card-body">
+</h3>
 
-                    <?php if(!empty($message)): ?>
+</div>
 
-                        <div class="alert alert-success">
-                            <?= htmlspecialchars($message) ?>
-                        </div>
+<div class="card-body">
 
-                    <?php endif; ?>
+<?php if($message): ?>
 
-                    <form method="POST"
-                          enctype="multipart/form-data">
+<div class="alert alert-success">
 
-                        <div class="mb-3">
+<?= htmlspecialchars($message) ?>
 
-                            <label>Product Name</label>
+</div>
 
-                            <input
-                                type="text"
-                                name="product_name"
-                                class="form-control"
-                                required>
+<?php endif; ?>
 
-                        </div>
+<form
+method="POST"
+enctype="multipart/form-data">
 
-                        <div class="mb-3">
+<div class="mb-3">
 
-                            <label>Category</label>
+<label>
 
-                            <input
-                                type="text"
-                                name="category"
-                                class="form-control"
-                                required>
+Product Name
 
-                        </div>
+</label>
 
-                        <div class="mb-3">
+<input
+type="text"
+name="product_name"
+class="form-control"
+required>
 
-                            <label>Quantity</label>
+</div>
 
-                            <input
-                                type="number"
-                                step="0.01"
-                                name="quantity"
-                                class="form-control"
-                                required>
+<div class="mb-3">
 
-                        </div>
+<label>
 
-                        <div class="mb-3">
+Category
 
-                            <label>Unit</label>
+</label>
 
-                            <select
-                                name="unit"
-                                class="form-control">
+<input
+type="text"
+name="category"
+class="form-control"
+required>
 
-                                <option>Kg</option>
-                                <option>Ton</option>
-                                <option>Bag</option>
-                                <option>Crate</option>
+</div>
 
-                            </select>
+<div class="mb-3">
 
-                        </div>
+<label>
 
-                        <div class="mb-3">
+Quantity
 
-                            <label>Price (₦)</label>
+</label>
 
-                            <input
-                                type="number"
-                                step="0.01"
-                                name="price"
-                                class="form-control"
-                                required>
+<input
+type="number"
+step="0.01"
+name="quantity"
+class="form-control"
+required>
 
-                        </div>
+</div>
 
-                        <div class="mb-3">
+<div class="mb-3">
 
-                            <label>Description</label>
+<label>
 
-                            <textarea
-                                name="description"
-                                class="form-control"
-                                rows="4"></textarea>
+Unit
 
-                        </div>
+</label>
 
-                        <div class="mb-3">
+<select
+name="unit"
+class="form-control">
 
-                            <label>Product Image</label>
+<option>
 
-                            <input
-                                type="file"
-                                name="image"
-                                accept="image/*"
-                                class="form-control">
+Kg
 
-                        </div>
+</option>
 
-                        <button
-                            type="submit"
-                            class="btn btn-success">
+<option>
 
-                            Save Product
+Ton
 
-                        </button>
+</option>
 
-                    </form>
+<option>
 
-                </div>
+Bag
 
-            </div>
+</option>
 
-        </div>
+<option>
 
-    </div>
+Crate
+
+</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Price (₦)
+
+</label>
+
+<input
+type="number"
+step="0.01"
+name="price"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Description
+
+</label>
+
+<textarea
+name="description"
+class="form-control"
+rows="4">
+
+</textarea>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Product Image
+
+</label>
+
+<input
+type="file"
+name="image"
+accept=".jpg,.jpeg,.png,.webp"
+class="form-control">
+
+<small>
+
+Maximum size:
+5MB
+
+</small>
+
+</div>
+
+<button
+type="submit"
+class="btn btn-success">
+
+Save Product
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 

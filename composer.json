@@ -1,0 +1,12 @@
+{
+    "name": "msughabraham/farmlink",
+    "description": "FarmLink Agricultural Platform",
+    "authors": [
+        {
+            "name": "Mathew"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^7.1"
+    }
+}

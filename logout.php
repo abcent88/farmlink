@@ -1,10 +1,20 @@
+
 <?php
 
-session_start();
+
+require_once
+'includes/auth.php';
+
 
 session_unset();
 
 session_destroy();
 
-header("Location: /projects/farmlink/index.php");
+
+header(
+'Location: login.php'
+);
+
 exit;
+
+?>

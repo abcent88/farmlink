@@ -19,7 +19,11 @@ $stmt->execute([$productId]);
 $product = $stmt->fetch();
 
 if (!$product) {
-    die("Product not found");
+    appError(
+$e->getMessage()
+);
+
+appFail();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

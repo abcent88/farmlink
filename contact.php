@@ -4,95 +4,205 @@
 
 <div class="container mt-5">
 
-
 <div class="text-center mb-5">
 
-    <h1>Contact Us</h1>
+<h1>
 
-    <p class="lead">
-        We'd love to hear from you.
-    </p>
+Contact Us
+
+</h1>
+
+<p class="lead">
+
+We'd love to hear from you.
+
+</p>
 
 </div>
+
 
 <div class="row">
 
-    <div class="col-md-5">
 
-        <div class="card shadow p-4 mb-4">
+<div class="col-md-5">
 
-            <h3>Contact Information</h3>
+<div class="card shadow p-4 mb-4">
 
-            <p>
-                <strong>Email:</strong><br>
-                info@farmlink.com
-            </p>
+<h3>
 
-            <p>
-                <strong>Phone:</strong><br>
-                +234 800 000 0000
-            </p>
+Contact Information
 
-            <p>
-                <strong>Location:</strong><br>
-                Nigeria
-            </p>
+</h3>
 
-        </div>
 
-    </div>
+<p>
 
-    <div class="col-md-7">
+<strong>Email:</strong>
 
-        <div class="card shadow p-4">
+<br>
 
-            <h3>Send a Message</h3>
+<a href="mailto:msughmathewabraham@gmail.com">
 
-            <form>
+msughmathewabraham@gmail.com
 
-                <div class="mb-3">
-                    <label class="form-label">
-                        Full Name
-                    </label>
+</a>
 
-                    <input
-                        type="text"
-                        class="form-control">
-                </div>
+</p>
 
-                <div class="mb-3">
-                    <label class="form-label">
-                        Email
-                    </label>
 
-                    <input
-                        type="email"
-                        class="form-control">
-                </div>
+<p>
 
-                <div class="mb-3">
-                    <label class="form-label">
-                        Message
-                    </label>
+<strong>Phone:</strong>
 
-                    <textarea
-                        class="form-control"
-                        rows="5"></textarea>
-                </div>
+<br>
 
-                <button
-                    class="btn btn-success">
-                    Send Message
-                </button>
+<a href="tel:07079530220">
 
-            </form>
+07079530220
 
-        </div>
+</a>
 
-    </div>
+</p>
+
+
+<p>
+
+<strong>WhatsApp:</strong>
+
+<br>
+
+<a
+href="https://wa.me/2347079530220"
+target="_blank"
+class="btn btn-success">
+
+Chat on WhatsApp
+
+</a>
+
+</p>
+
+
+<p>
+
+<strong>Location:</strong>
+
+<br>
+
+Nigeria
+
+</p>
+
+
+<p>
+
+<a
+href="https://maps.google.com/?q=opp foma clinic Gboko north Benue Nigeria"
+target="_blank"
+class="btn btn-outline-primary">
+
+View Location on Google Maps
+
+</a>
+
+</p>
+
+
+<small class="text-muted">
+
+
+
+</small>
+
 
 </div>
 
+</div>
+
+
+
+<div class="col-md-7">
+
+<div class="card shadow p-4">
+
+<h3>
+
+Send a Message
+
+</h3>
+
+
+<form
+method="POST">
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Full Name
+
+</label>
+
+<input
+type="text"
+name="fullname"
+class="form-control"
+required>
+
+</div>
+
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Email
+
+</label>
+
+<input
+type="email"
+name="email"
+class="form-control"
+required>
+
+</div>
+
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Message
+
+</label>
+
+<textarea
+name="message"
+class="form-control"
+rows="5"
+required></textarea>
+
+</div>
+
+
+<button
+type="submit"
+class="btn btn-success">
+
+Send Message
+
+</button>
+
+
+</form>
+
+</div>
+
+</div>
+
+
+</div>
 
 </div>
 

@@ -1,3 +1,23 @@
+<?php
+
+header(
+'X-Frame-Options: SAMEORIGIN'
+);
+
+header(
+'X-Content-Type-Options: nosniff'
+);
+
+header(
+'Referrer-Policy: strict-origin'
+);
+
+header(
+'X-XSS-Protection: 1; mode=block'
+);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

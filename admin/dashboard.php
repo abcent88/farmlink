@@ -130,6 +130,123 @@ $totalCommission=
 $totalCommission
 ->fetchColumn()
 ?:0;
+/*
+Analytics
+*/
+
+$totalInvestors=
+$pdo->query(
+
+"
+
+SELECT COUNT(*)
+
+FROM users
+
+WHERE role='investor'
+
+"
+
+)->fetchColumn();
+
+$pendingWithdrawals=
+$pdo->query(
+
+"
+
+SELECT COUNT(*)
+
+FROM investor_withdrawals
+
+WHERE status='pending'
+
+"
+
+)->fetchColumn();
+
+$totalProducts=
+$pdo->query(
+
+"
+
+SELECT COUNT(*)
+
+FROM products
+
+"
+
+)->fetchColumn();
+
+$approvedProducts=
+$pdo->query(
+
+"
+
+SELECT COUNT(*)
+
+FROM products
+
+WHERE status='approved'
+
+"
+
+)->fetchColumn();
+
+$investedCapital=
+$pdo->query(
+
+"
+
+SELECT
+COALESCE(
+SUM(invested_amount),
+0
+)
+
+FROM investors
+
+"
+
+)->fetchColumn();
+
+$monthlyOrders=
+$pdo->query(
+
+"
+
+SELECT
+COUNT(*)
+
+FROM orders
+
+WHERE
+MONTH(created_at)=MONTH(NOW())
+
+AND
+
+YEAR(created_at)=YEAR(NOW())
+
+"
+
+)->fetchColumn();
+
+$todayUsers=
+$pdo->query(
+
+"
+
+SELECT
+COUNT(*)
+
+FROM users
+
+WHERE
+DATE(created_at)=CURDATE()
+
+"
+
+)->fetchColumn();
+
 
 include '../includes/header.php';
 include '../includes/navbar.php';
@@ -424,6 +541,13 @@ Financial
 </div>
 
 </a>
+<a
+href="generate_investor_earnings.php"
+class="btn btn-success">
+
+Generate Investor Earnings
+
+</a>
 
 </div>
 
@@ -498,25 +622,11 @@ Buyers
 <div class="col-md-4">
 
 <a
-href="../logout.php"
-class="nav-link-card">
+href="roi_settings.php"
+class="btn btn-primary">
 
-<div
-class="
-card
-shadow
-p-4
-bg-danger
-text-white
-">
 
-<h5>
-
-🚪 Logout
-
-</h5>
-
-</div>
+ROI Settings
 
 </a>
 
@@ -525,6 +635,180 @@ text-white
 </div>
 
 </div>
+<br>
+
+<div class="row g-4">
+
+<div class="col-md-3">
+
+<div class="card shadow p-4">
+
+<h6>
+
+Investors
+
+</h6>
+
+<h2>
+
+🏦
+
+<?= $totalInvestors ?>
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow p-4">
+
+<h6>
+
+Pending Withdrawals
+
+</h6>
+
+<h2>
+
+💵
+
+<?= $pendingWithdrawals ?>
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow p-4">
+
+<h6>
+
+Products
+
+</h6>
+
+<h2>
+
+🌽
+
+<?= $totalProducts ?>
+
+</h2>
+
+<small>
+
+Approved:
+
+<?= $approvedProducts ?>
+
+</small>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow p-4">
+
+<h6>
+
+Investor Capital
+
+</h6>
+
+<h2>
+
+₦<?= number_format(
+$investedCapital,
+2
+) ?>
+
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="row g-4">
+
+<div class="col-md-6">
+
+<div class="card shadow p-4">
+
+<h5>
+
+This Month Orders
+
+</h5>
+
+<h1>
+
+🛒
+
+<?= $monthlyOrders ?>
+
+</h1>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="card shadow p-4">
+
+<h5>
+
+New Users Today
+
+</h5>
+
+<h1>
+
+🔥
+
+<?= $todayUsers ?>
+
+</h1>
+
+</div>
+
+</div>
+
+</div>
+<div class="col-md-3">
+
+<a
+href="activity_logs.php"
+class="nav-link-card">
+
+<div class="card admin-card">
+
+<div class="admin-icon">
+
+🧾
+
+</div>
+
+Logs
+
+</div>
+
+</a>
+
+</div>
+
 
 <?php include '../includes/footer.php'; ?>
 
