@@ -1,64 +1,116 @@
 :root{
-
---bg:#f7f8fa;
---card:#ffffff;
-
---text:#222;
-
---primary:#2e7d32;
-
+    --bg:#f8f9fa;
+    --text:#212529;
+    --card:#ffffff;
+    --border:#dee2e6;
 }
 
-[data-theme="dark"]{
-
---bg:#111827;
-
---card:#1f2937;
-
---text:#ffffff;
-
---primary:#4ade80;
-
+body[data-theme="dark"]{
+    --bg:#121212;
+    --text:#f8f9fa;
+    --card:#1f1f1f;
+    --border:#444;
 }
 
 body{
-
-background:var(--bg);
-
-color:var(--text);
-
-transition:.3s;
-
+    background:var(--bg);
+    color:var(--text);
+    transition:.3s;
 }
+
+/* Headings */
+
+h1,h2,h3,h4,h5,h6,
+p,
+label,
+small{
+    color:var(--text);
+}
+
+/* Cards */
 
 .card{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+}
 
-background:var(--card);
+/* Forms */
 
-border:none;
+.form-control,
+.form-select{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+}
 
-border-radius:20px;
+.form-control:focus,
+.form-select:focus{
+    background:var(--card);
+    color:var(--text);
+}
+
+/* Tables */
+
+.table{
+    color:var(--text);
+}
+
+.table th,
+.table td{
+    color:var(--text);
+}
+
+/* Bootstrap containers */
+
+.container,
+.container-fluid{
+    color:var(--text);
+}
+
+/* Links */
+
+a{
+    color:inherit;
+}
+
+/* Lists */
+
+.list-group-item{
+    background:var(--card);
+    color:var(--text);
+}
+
+/* Modals */
+
+.modal-content{
+    background:var(--card);
+    color:var(--text);
+}
+[data-theme="dark"]{
+
+    color-scheme:dark;
 
 }
 
-.nav-card{
+[data-theme="dark"] a{
 
-padding:25px;
-
-text-align:center;
-
-cursor:pointer;
+    color:#7dd3fc;
 
 }
 
-.nav-card:hover{
+[data-theme="dark"] .btn-outline-secondary{
 
-transform:translateY(-4px);
+    color:#fff;
+    border-color:#666;
 
 }
 
-.icon{
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select{
 
-font-size:42px;
+    background:var(--card);
+    color:var(--text);
 
 }

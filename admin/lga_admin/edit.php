@@ -85,7 +85,7 @@ include '../../includes/navbar.php';
         <div class="card-body">
 
             <form method="POST">
-
+<?= csrfField(); ?>
                 <div class="mb-3">
                     <label>Full Name</label>
                     <input

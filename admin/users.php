@@ -4,6 +4,11 @@ require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/csrf.php';
 require_once '../includes/roles.php';
+require_once '../includes/csrf.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+}
 
 requireRole('super_admin');
 
@@ -66,6 +71,7 @@ $users = $stmt->fetchAll();
         Back Dashboard
     </a>
 <form method="GET" class="mb-3">
+    <?= csrfField(); ?>
 
     <div class="row">
 
@@ -152,6 +158,7 @@ $users = $stmt->fetchAll();
     </form>
 
     <form method="POST"
+   
           action="block_user.php"
           style="display:inline;">
 

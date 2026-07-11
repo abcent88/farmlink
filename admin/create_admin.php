@@ -2,6 +2,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
+require_once '../includes/csrf.php';
 
 requireRole('super_admin');
 
@@ -9,6 +10,7 @@ $message = '';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+     verify_csrf();
 
     $fullname = trim($_POST['fullname']);
     $email    = trim($_POST['email']);
@@ -56,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/navbar.php'; ?>
+require_once '../includes/csrf.php';
 
 <div class="container mt-5">
     <h2>Create LGA Admin</h2>
@@ -75,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form method="POST">
+        <?= csrfField(); ?>
         <div class="mb-3">
             <label>Full Name</label>
             <input type="text" name="fullname" class="form-control" required>

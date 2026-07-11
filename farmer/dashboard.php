@@ -287,37 +287,20 @@ Manage
 
 <div class="col-md-3">
 
-<a
-href="earnings.php"
-class="dashboard-link">
+<a href="earnings.php" class="dashboard-link">
 
-<div
-class="
-card
-dashboard-card
-bg-dark
-text-white
-">
+<div class="card dashboard-card bg-primary text-white">
 
 <div class="dashboard-icon">
-
 💰
-
 </div>
 
-<h5>
+<h4>
+₦<?= number_format((float)$totalRevenue, 2) ?>
+</h4>
 
+<p class="mb-0">
 Revenue
-
-</h5>
-
-<p>
-
-₦<?= number_format(
-$totalRevenue,
-2
-) ?>
-
 </p>
 
 </div>

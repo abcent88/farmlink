@@ -3,6 +3,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
+require_once '../includes/csrf.php';
 
 requireRole('investor');
 
@@ -32,7 +33,7 @@ appFail(
 $message='';
 
 if($_SERVER['REQUEST_METHOD']=='POST'){
-
+verify_csrf();
 if(
 strtotime(
 $investor['withdrawal_date']
@@ -105,7 +106,7 @@ include '../includes/navbar.php';
 <div class="card-body">
 
 <form method="POST">
-
+<?= csrfField(); ?>
 <div class="mb-3">
 
 <label>

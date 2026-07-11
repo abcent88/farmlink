@@ -3,6 +3,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
+require_once '../includes/csrf.php';
 
 requireRole('super_admin');
 
@@ -82,6 +83,7 @@ ROI Settings
 <div class="card-body">
 
 <form method="POST">
+    <?= csrfField(); ?>
 
 <label>
 

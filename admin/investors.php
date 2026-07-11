@@ -8,6 +8,7 @@ require_once '../config/database.php';
 
 require_once '../includes/mailer.php';
 require_once '../includes/notify.php';
+require_once '../includes/csrf.php';
 
 
 
@@ -20,7 +21,7 @@ $message='';
 if(
 $_SERVER['REQUEST_METHOD']==='POST'
 ){
-
+verify_csrf();
 try{
 
 $pdo->beginTransaction();
@@ -336,6 +337,7 @@ Create Investor
 <?php endif; ?>
 
 <form method="POST">
+    <?= csrfField(); ?>
 
 <div class="mb-3">
 

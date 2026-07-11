@@ -1,4 +1,3 @@
-
 <?php
 
 require_once '../includes/auth.php';
@@ -7,330 +6,249 @@ require_once '../config/database.php';
 
 requireRole('super_admin');
 
-$totalUsers =
-$pdo->query(
-"SELECT COUNT(*) FROM users"
-)->fetchColumn();
-
-$totalFarmers =
-$pdo->query(
-"SELECT COUNT(*) FROM users WHERE role='farmer'"
-)->fetchColumn();
-
-$totalBuyers =
-$pdo->query(
-"SELECT COUNT(*) FROM users WHERE role='buyer'"
-)->fetchColumn();
-
-$pendingUsers =
-$pdo->query(
-"SELECT COUNT(*) FROM users WHERE status='pending'"
-)->fetchColumn();
-
-$productStats =
-[
-'pending'=>0,
-'approved'=>0,
-'rejected'=>0
-];
-
-$stmt=
-$pdo->query("
-SELECT status,
-COUNT(*) total
-FROM products
-GROUP BY status
-");
-
-while(
-$row=
-$stmt->fetch()
-){
-
-$productStats[
-$row['status']
-]=$row['total'];
-
-}
-
-$orderStats=
-[
-'pending'=>0,
-'accepted'=>0,
-'completed'=>0,
-'rejected'=>0
-];
-
-$stmt=
-$pdo->query("
-SELECT
-status,
-COUNT(*) total
-FROM orders
-GROUP BY status
-");
-
-while(
-$row=
-$stmt->fetch()
-){
-
-$orderStats[
-$row['status']
-]=$row['total'];
-
-}
-
-$platformRevenue=
-$pdo->query("
-
-SELECT
-SUM(
-o.quantity*
-p.price*
-0.05
-)
-
-FROM orders o
-
-JOIN products p
-ON o.product_id=p.id
-
-WHERE
-o.status
-IN(
-'accepted',
-'completed'
-)
-
-")->fetchColumn();
-
-$platformRevenue=
-$platformRevenue
-?:0;
-
-$totalCommission=
-$pdo->prepare("
-
-SELECT
-SUM(amount)
-
-FROM admin_commissions
-
-WHERE admin_id=?
-
-");
-
-$totalCommission
-->execute([
-$_SESSION['user_id']
-]);
-
-$totalCommission=
-$totalCommission
-->fetchColumn()
-?:0;
 /*
-Analytics
+|--------------------------------------------------------------------------
+| User Statistics
+|--------------------------------------------------------------------------
 */
 
-$totalInvestors=
-$pdo->query(
+$totalUsers = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM users
+")->fetchColumn();
 
-"
+$totalFarmers = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM users
+    WHERE role='farmer'
+")->fetchColumn();
 
-SELECT COUNT(*)
+$totalBuyers = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM users
+    WHERE role='buyer'
+")->fetchColumn();
 
-FROM users
+$pendingUsers = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM users
+    WHERE status='pending'
+")->fetchColumn();
 
-WHERE role='investor'
+/*
+|--------------------------------------------------------------------------
+| Product Statistics
+|--------------------------------------------------------------------------
+*/
 
-"
+$productStats = [
+    'pending'  => 0,
+    'approved' => 0,
+    'rejected' => 0
+];
 
-)->fetchColumn();
+$stmt = $pdo->query("
+    SELECT status, COUNT(*) AS total
+    FROM products
+    GROUP BY status
+");
 
-$pendingWithdrawals=
-$pdo->query(
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $productStats[$row['status']] = (int)$row['total'];
+}
 
-"
+$totalProducts = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM products
+")->fetchColumn();
 
-SELECT COUNT(*)
+$approvedProducts = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM products
+    WHERE status='approved'
+")->fetchColumn();
 
-FROM investor_withdrawals
+/*
+|--------------------------------------------------------------------------
+| Order Statistics
+|--------------------------------------------------------------------------
+*/
 
-WHERE status='pending'
+$orderStats = [
+    'pending'   => 0,
+    'accepted'  => 0,
+    'completed' => 0,
+    'rejected'  => 0
+];
 
-"
+$stmt = $pdo->query("
+    SELECT status, COUNT(*) AS total
+    FROM orders
+    GROUP BY status
+");
 
-)->fetchColumn();
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $orderStats[$row['status']] = (int)$row['total'];
+}
 
-$totalProducts=
-$pdo->query(
+$monthlyOrders = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM orders
+    WHERE MONTH(created_at)=MONTH(CURDATE())
+      AND YEAR(created_at)=YEAR(CURDATE())
+")->fetchColumn();
 
-"
+/*
+|--------------------------------------------------------------------------
+| Platform Revenue
+|--------------------------------------------------------------------------
+*/
 
-SELECT COUNT(*)
+$stmt = $pdo->query("
+    SELECT
+        COALESCE(SUM(o.quantity * p.price * 0.05),0)
+    FROM orders o
+    INNER JOIN products p
+        ON p.id = o.product_id
+    WHERE o.status IN ('accepted','completed')
+");
 
-FROM products
+$platformRevenue = (float)$stmt->fetchColumn();
 
-"
+/*
+|--------------------------------------------------------------------------
+| Admin Commission
+|--------------------------------------------------------------------------
+*/
 
-)->fetchColumn();
+$stmt = $pdo->prepare("
+    SELECT COALESCE(SUM(amount),0)
+    FROM admin_commissions
+    WHERE admin_id=?
+");
 
-$approvedProducts=
-$pdo->query(
+$stmt->execute([
+    $_SESSION['user_id']
+]);
 
-"
+$totalCommission = (float)$stmt->fetchColumn();
 
-SELECT COUNT(*)
+/*
+|--------------------------------------------------------------------------
+| Investor Statistics
+|--------------------------------------------------------------------------
+*/
 
-FROM products
+$totalInvestors = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM users
+    WHERE role='investor'
+")->fetchColumn();
 
-WHERE status='approved'
+$pendingWithdrawals = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM investor_withdrawals
+    WHERE status='pending'
+")->fetchColumn();
 
-"
+$investedCapital = (float)$pdo->query("
+    SELECT COALESCE(SUM(invested_amount),0)
+    FROM investors
+")->fetchColumn();
 
-)->fetchColumn();
+/*
+|--------------------------------------------------------------------------
+| Today's Statistics
+|--------------------------------------------------------------------------
+*/
 
-$investedCapital=
-$pdo->query(
-
-"
-
-SELECT
-COALESCE(
-SUM(invested_amount),
-0
-)
-
-FROM investors
-
-"
-
-)->fetchColumn();
-
-$monthlyOrders=
-$pdo->query(
-
-"
-
-SELECT
-COUNT(*)
-
-FROM orders
-
-WHERE
-MONTH(created_at)=MONTH(NOW())
-
-AND
-
-YEAR(created_at)=YEAR(NOW())
-
-"
-
-)->fetchColumn();
-
-$todayUsers=
-$pdo->query(
-
-"
-
-SELECT
-COUNT(*)
-
-FROM users
-
-WHERE
-DATE(created_at)=CURDATE()
-
-"
-
-)->fetchColumn();
-
+$todayUsers = (int)$pdo->query("
+    SELECT COUNT(*)
+    FROM users
+    WHERE DATE(created_at)=CURDATE()
+")->fetchColumn();
 
 include '../includes/header.php';
 include '../includes/navbar.php';
-
 ?>
-
 <style>
 
 .admin-card{
-
-border:none;
-
-border-radius:24px;
-
-padding:25px;
-
-text-align:center;
-
-height:190px;
-
-transition:.3s;
-
+    border:none;
+    border-radius:20px;
+    padding:25px;
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    transition:.3s ease;
+    box-shadow:0 .5rem 1rem rgba(0,0,0,.08);
 }
 
 .admin-card:hover{
-
-transform:
-translateY(-5px);
-
+    transform:translateY(-6px);
+    box-shadow:0 .8rem 1.5rem rgba(0,0,0,.15);
 }
 
 .admin-icon{
+    font-size:48px;
+    margin-bottom:15px;
+}
 
-font-size:46px;
+.admin-card h3,
+.admin-card h4{
+    margin-bottom:10px;
+    font-weight:700;
+}
 
-margin-bottom:10px;
-
+.admin-card p{
+    margin:0;
+    font-size:15px;
 }
 
 .nav-link-card{
-
-text-decoration:none;
-
-color:inherit;
-
+    text-decoration:none;
+    color:inherit;
 }
 
-.dark-mode .card{
+.nav-link-card:hover{
+    color:inherit;
+    text-decoration:none;
+}
 
-background:#1f2937;
-
-color:white;
-
+.dark-mode .admin-card{
+    background:#1f2937;
+    color:#fff;
 }
 
 </style>
 
 <div class="container mt-4">
 
-<h2>
-
+<h2 class="mb-1">
 🛠 Super Admin Dashboard
-
 </h2>
 
-<p>
-
-Welcome
-
-<?= htmlspecialchars(
-$_SESSION['fullname']
-) ?>
-
+<p class="text-muted">
+Welcome,
+<strong><?= htmlspecialchars($_SESSION['fullname']) ?></strong>
 </p>
+
+<!-- ===========================
+MAIN DASHBOARD CARDS
+=========================== -->
 
 <div class="row g-4">
 
-<div class="col-md-3">
+<!-- USERS -->
 
-<a
-href="users.php"
-class="nav-link-card">
+<div class="col-lg-3 col-md-6">
 
-<div class="card admin-card">
+<a href="users.php" class="nav-link-card">
+
+<div class="admin-card bg-primary text-white">
 
 <div class="admin-icon">
 
@@ -338,13 +256,17 @@ class="nav-link-card">
 
 </div>
 
-<h4>
+<h3>
 
-<?= $totalUsers ?>
+<?= number_format($totalUsers) ?>
 
-</h4>
+</h3>
+
+<p>
 
 Users
+
+</p>
 
 </div>
 
@@ -352,13 +274,13 @@ Users
 
 </div>
 
-<div class="col-md-3">
+<!-- PRODUCTS -->
 
-<a
-href="products.php"
-class="nav-link-card">
+<div class="col-lg-3 col-md-6">
 
-<div class="card admin-card">
+<a href="products.php" class="nav-link-card">
+
+<div class="admin-card bg-success text-white">
 
 <div class="admin-icon">
 
@@ -366,13 +288,17 @@ class="nav-link-card">
 
 </div>
 
-<h4>
+<h3>
 
-<?= $productStats['approved'] ?>
+<?= number_format($productStats['approved']) ?>
 
-</h4>
+</h3>
 
-Products
+<p>
+
+Approved Products
+
+</p>
 
 </div>
 
@@ -380,19 +306,13 @@ Products
 
 </div>
 
-<div class="col-md-3">
+<!-- ORDERS -->
 
-<a
-href="orders.php"
-class="nav-link-card">
+<div class="col-lg-3 col-md-6">
 
-<div
-class="
-card
-admin-card
-bg-success
-text-white
-">
+<a href="orders.php" class="nav-link-card">
+
+<div class="admin-card bg-warning text-dark">
 
 <div class="admin-icon">
 
@@ -400,13 +320,17 @@ text-white
 
 </div>
 
-<h4>
+<h3>
 
-<?= $orderStats['completed'] ?>
+<?= number_format($orderStats['completed']) ?>
 
-</h4>
+</h3>
 
-Orders
+<p>
+
+Completed Orders
+
+</p>
 
 </div>
 
@@ -414,19 +338,13 @@ Orders
 
 </div>
 
-<div class="col-md-3">
+<!-- REVENUE -->
 
-<a
-href="revenue.php"
-class="nav-link-card">
+<div class="col-lg-3 col-md-6">
 
-<div
-class="
-card
-admin-card
-bg-dark
-text-white
-">
+<a href="revenue.php" class="nav-link-card">
+
+<div class="admin-card bg-dark text-white">
 
 <div class="admin-icon">
 
@@ -436,14 +354,15 @@ text-white
 
 <h4>
 
-₦<?= number_format(
-$platformRevenue,
-2
-) ?>
+₦<?= number_format($platformRevenue,2) ?>
 
 </h4>
 
-Revenue
+<p>
+
+Platform Revenue
+
+</p>
 
 </div>
 
@@ -454,361 +373,526 @@ Revenue
 </div>
 
 <br>
+<!-- =======================================
+ADMIN TOOLS
+======================================= -->
 
-<div class="row g-4">
+<div class="row g-4 mt-2">
 
-<div class="col-md-3">
+    <!-- Pending Users -->
 
-<a
-href="users.php"
-class="nav-link-card">
+    <div class="col-lg-3 col-md-6">
 
-<div class="card admin-card">
+        <a href="pending_users.php" class="nav-link-card">
 
-<div class="admin-icon">
+            <div class="admin-card bg-warning text-dark">
 
-⏳
+                <div class="admin-icon">
+                    ⏳
+                </div>
 
-</div>
+                <h3>
+                    <?= number_format($pendingUsers) ?>
+                </h3>
 
-<h4>
+                <p>
+                    Pending Users
+                </p>
 
-<?= $pendingUsers ?>
+            </div>
 
-</h4>
+        </a>
 
-Pending Users
+    </div>
 
-</div>
+    <!-- Commission -->
 
-</a>
+    <div class="col-lg-3 col-md-6">
 
-</div>
+        <a href="commissions.php" class="nav-link-card">
 
-<div class="col-md-3">
+            <div class="admin-card bg-info text-white">
 
-<a
-href="commissions.php"
-class="nav-link-card">
+                <div class="admin-icon">
+                    📈
+                </div>
 
-<div
-class="
-card
-admin-card
-bg-info
-text-white
-">
+                <h4>
 
-<div class="admin-icon">
+                    ₦<?= number_format($totalCommission,2) ?>
 
-📈
+                </h4>
 
-</div>
+                <p>
 
-<h4>
+                    Total Commission
 
-₦<?= number_format(
-$totalCommission,
-2
-) ?>
+                </p>
 
-</h4>
+            </div>
 
-Commission
+        </a>
 
-</div>
+    </div>
 
-</a>
+    <!-- Financial Dashboard -->
 
-</div>
+    <div class="col-lg-3 col-md-6">
 
-<div class="col-md-3">
+        <a href="financial_dashboard.php" class="nav-link-card">
 
-<a
-href="financial_dashboard.php"
-class="nav-link-card">
+            <div class="admin-card bg-primary text-white">
 
-<div class="card admin-card">
+                <div class="admin-icon">
+                    🏦
+                </div>
 
-<div class="admin-icon">
+                <h5>
 
-🏦
+                    Financial Dashboard
 
-</div>
+                </h5>
 
-Financial
+                <small>
 
-</div>
+                    View Reports
 
-</a>
-<a
-href="generate_investor_earnings.php"
-class="btn btn-success">
+                </small>
 
-Generate Investor Earnings
+            </div>
 
-</a>
+        </a>
 
-</div>
+    </div>
 
-<div class="col-md-3">
+    <!-- LGA Admins -->
 
-<a
-href="lga_admin/list.php"
-class="nav-link-card">
+    <div class="col-lg-3 col-md-6">
 
-<div class="card admin-card">
+        <a href="lga_admin/list.php" class="nav-link-card">
 
-<div class="admin-icon">
+            <div class="admin-card bg-success text-white">
 
-📍
+                <div class="admin-icon">
+                    📍
+                </div>
 
-</div>
+                <h5>
 
-LGA Admins
+                    LGA Admins
 
-</div>
+                </h5>
 
-</a>
+                <small>
 
-</div>
+                    Manage LGAs
 
-</div>
+                </small>
 
-<br>
+            </div>
 
-<div class="row g-4">
+        </a>
 
-<div class="col-md-4">
-
-<div class="card shadow p-4">
-
-<h5>
-
-Farmers
-
-</h5>
-
-<h2>
-
-<?= $totalFarmers ?>
-
-</h2>
+    </div>
 
 </div>
 
-</div>
 
-<div class="col-md-4">
+<!-- =======================================
+SECOND ROW
+======================================= -->
 
-<div class="card shadow p-4">
+<div class="row g-4 mt-2">
 
-<h5>
+    <!-- Generate Investor Earnings -->
 
-Buyers
+    <div class="col-lg-4">
 
-</h5>
+        <div class="admin-card bg-light">
 
-<h2>
+            <div class="admin-icon">
+                💸
+            </div>
 
-<?= $totalBuyers ?>
+            <h5>
 
-</h2>
+                Investor Earnings
 
-</div>
+            </h5>
 
-</div>
+            <a href="generate_investor_earnings.php"
+               class="btn btn-success mt-3">
 
-<div class="col-md-4">
+                Generate Earnings
 
-<a
-href="roi_settings.php"
-class="btn btn-primary">
+            </a>
 
+        </div>
 
-ROI Settings
+    </div>
 
-</a>
+    <!-- ROI -->
 
-</div>
+    <div class="col-lg-4">
 
-</div>
+        <div class="admin-card bg-light">
 
-</div>
-<br>
+            <div class="admin-icon">
+                📊
+            </div>
 
-<div class="row g-4">
+            <h5>
 
-<div class="col-md-3">
+                ROI Settings
 
-<div class="card shadow p-4">
+            </h5>
 
-<h6>
+            <a href="roi_settings.php"
+               class="btn btn-primary mt-3">
 
-Investors
+                Manage ROI
 
-</h6>
+            </a>
 
-<h2>
+        </div>
 
-🏦
+    </div>
 
-<?= $totalInvestors ?>
+    <!-- Activity Logs -->
 
-</h2>
+    <div class="col-lg-4">
 
-</div>
+        <a href="activity_logs.php"
+           class="nav-link-card">
 
-</div>
+            <div class="admin-card bg-secondary text-white">
 
-<div class="col-md-3">
+                <div class="admin-icon">
+                    🧾
+                </div>
 
-<div class="card shadow p-4">
+                <h5>
 
-<h6>
+                    Activity Logs
 
-Pending Withdrawals
+                </h5>
 
-</h6>
+                <small>
 
-<h2>
+                    System Monitoring
 
-💵
+                </small>
 
-<?= $pendingWithdrawals ?>
+            </div>
 
-</h2>
+        </a>
 
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card shadow p-4">
-
-<h6>
-
-Products
-
-</h6>
-
-<h2>
-
-🌽
-
-<?= $totalProducts ?>
-
-</h2>
-
-<small>
-
-Approved:
-
-<?= $approvedProducts ?>
-
-</small>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card shadow p-4">
-
-<h6>
-
-Investor Capital
-
-</h6>
-
-<h2>
-
-₦<?= number_format(
-$investedCapital,
-2
-) ?>
-
-</h2>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
 <br>
+<!-- ==========================================
+ANALYTICS
+========================================== -->
+
+<h3 class="mt-5 mb-4">
+📊 Platform Analytics
+</h3>
 
 <div class="row g-4">
 
-<div class="col-md-6">
+    <!-- Farmers -->
 
-<div class="card shadow p-4">
+    <div class="col-lg-3 col-md-6">
 
-<h5>
+        <div class="admin-card bg-success text-white">
 
-This Month Orders
+            <div class="admin-icon">
+                👨‍🌾
+            </div>
 
-</h5>
+            <h3><?= number_format($totalFarmers) ?></h3>
 
-<h1>
+            <p>Registered Farmers</p>
 
-🛒
+        </div>
 
-<?= $monthlyOrders ?>
+    </div>
 
-</h1>
+    <!-- Buyers -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card bg-primary text-white">
+
+            <div class="admin-icon">
+                🛒
+            </div>
+
+            <h3><?= number_format($totalBuyers) ?></h3>
+
+            <p>Registered Buyers</p>
+
+        </div>
+
+    </div>
+
+    <!-- Investors -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card bg-info text-white">
+
+            <div class="admin-icon">
+                🏦
+            </div>
+
+            <h3><?= number_format($totalInvestors) ?></h3>
+
+            <p>Registered Investors</p>
+
+        </div>
+
+    </div>
+
+    <!-- Pending Withdrawals -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card bg-warning text-dark">
+
+            <div class="admin-icon">
+                💵
+            </div>
+
+            <h3><?= number_format($pendingWithdrawals) ?></h3>
+
+            <p>Pending Withdrawals</p>
+
+        </div>
+
+    </div>
 
 </div>
 
+<div class="row g-4 mt-2">
+
+    <!-- Products -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card">
+
+            <div class="admin-icon">
+                🌽
+            </div>
+
+            <h3><?= number_format($totalProducts) ?></h3>
+
+            <p>Total Products</p>
+
+            <small class="text-success">
+                Approved: <?= number_format($approvedProducts) ?>
+            </small>
+
+        </div>
+
+    </div>
+
+    <!-- Capital -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card bg-dark text-white">
+
+            <div class="admin-icon">
+                💰
+            </div>
+
+            <h4>
+
+                ₦<?= number_format($investedCapital,2) ?>
+
+            </h4>
+
+            <p>Total Capital</p>
+
+        </div>
+
+    </div>
+
+    <!-- Orders -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card bg-secondary text-white">
+
+            <div class="admin-icon">
+                📦
+            </div>
+
+            <h3><?= number_format($monthlyOrders) ?></h3>
+
+            <p>This Month Orders</p>
+
+        </div>
+
+    </div>
+
+    <!-- New Users -->
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="admin-card bg-danger text-white">
+
+            <div class="admin-icon">
+                🔥
+            </div>
+
+            <h3><?= number_format($todayUsers) ?></h3>
+
+            <p>Today's New Users</p>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="col-md-6">
+<br>
+<!-- ==========================================
+QUICK ACTIONS
+========================================== -->
 
-<div class="card shadow p-4">
+<div class="card shadow-lg border-0 mt-5">
 
-<h5>
+    <div class="card-header bg-dark text-white">
 
-New Users Today
+        <h3 class="mb-0">
+            ⚡ Quick Actions
+        </h3>
 
-</h5>
+    </div>
 
-<h1>
+    <div class="card-body">
 
-🔥
+        <div class="row g-3">
 
-<?= $todayUsers ?>
+            <div class="col-lg-3 col-md-4 col-sm-6">
 
-</h1>
+                <a href="users.php" class="btn btn-success w-100 py-3">
+                    👥<br>
+                    Manage Users
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="pending_users.php" class="btn btn-warning w-100 py-3">
+                    ⏳<br>
+                    Pending Users
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="products.php" class="btn btn-primary w-100 py-3">
+                    🌽<br>
+                    Products
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="orders.php" class="btn btn-info w-100 py-3">
+                    📦<br>
+                    Orders
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="investors.php" class="btn btn-secondary w-100 py-3">
+                    🏦<br>
+                    Investors
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="withdrawals.php" class="btn btn-danger w-100 py-3">
+                    💵<br>
+                    Withdrawals
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="commissions.php" class="btn btn-dark w-100 py-3">
+                    📈<br>
+                    Commissions
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="financial_dashboard.php" class="btn btn-primary w-100 py-3">
+                    💳<br>
+                    Financial Dashboard
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="generate_investor_earnings.php" class="btn btn-success w-100 py-3">
+                    💸<br>
+                    Generate Earnings
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="roi_settings.php" class="btn btn-info w-100 py-3">
+                    📊<br>
+                    ROI Settings
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="activity_logs.php" class="btn btn-secondary w-100 py-3">
+                    🧾<br>
+                    Activity Logs
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <a href="lga_admin/list.php" class="btn btn-success w-100 py-3">
+                    📍<br>
+                    LGA Admins
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-</div>
-
-</div>
-<div class="col-md-3">
-
-<a
-href="activity_logs.php"
-class="nav-link-card">
-
-<div class="card admin-card">
-
-<div class="admin-icon">
-
-🧾
-
-</div>
-
-Logs
-
-</div>
-
-</a>
-
-</div>
-
+<br><br>
 
 <?php include '../includes/footer.php'; ?>
-

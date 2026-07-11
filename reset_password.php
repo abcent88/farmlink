@@ -1,6 +1,7 @@
 <?php
 
 require_once 'config/database.php';
+require_once 'includes/csrf.php';
 
 $message='';
 
@@ -8,6 +9,7 @@ $token='';
 
 
 if($_SERVER['REQUEST_METHOD']==='GET'){
+    verify_csrf();
 
 $token=
 $_GET['token']
@@ -199,7 +201,7 @@ Open Reset Page
 <?php endif; ?>
 
 <form method="POST">
-
+<?= csrfField(); ?>
 <input
 type="hidden"
 name="token"

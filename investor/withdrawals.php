@@ -5,6 +5,7 @@ require_once '../includes/roles.php';
 require_once '../config/database.php';
 require_once '../includes/logger.php';
 require_once '../includes/notify.php';
+require_once '../includes/csrf.php';
 
 
 requireRole('investor');
@@ -98,7 +99,7 @@ $message='';
 
 
 if($_SERVER['REQUEST_METHOD']==='POST'){
-
+verify_csrf();
 $bank=
 trim(
 $_POST['bank_name']
@@ -300,7 +301,7 @@ $available,
 <?php endif; ?>
 
 <form method="POST">
-
+<?= csrfField(); ?>
 <div class="mb-3">
 
 <label>

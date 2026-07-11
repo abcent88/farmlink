@@ -116,7 +116,7 @@ include '../../includes/navbar.php';
         <?php endif; ?>
 
         <form method="POST">
-
+<?= csrfField(); ?>
             <div class="mb-3">
                 <label>Full Name</label>
                 <input

@@ -3,35 +3,25 @@
 require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
+require_once '../includes/csrf.php';
+require_once '../includes/error_handler.php';
 
 requireRole('farmer');
 
-$message='';
+$message = '';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-if($_SERVER['REQUEST_METHOD']==='POST'){
+    verify_csrf();
 
-$product_name=
-trim($_POST['product_name']);
+    $product_name = trim($_POST['product_name']);
+    $category     = trim($_POST['category']);
+    $quantity     = (float)$_POST['quantity'];
+    $unit         = trim($_POST['unit']);
+    $price        = (float)$_POST['price'];
+    $description  = trim($_POST['description']);
 
-$category=
-trim($_POST['category']);
-
-$quantity=
-$_POST['quantity'];
-
-$unit=
-trim($_POST['unit']);
-
-$price=
-$_POST['price'];
-
-$description=
-trim($_POST['description']);
-
-$imageName=null;
-
-
+    $imageName = null;
 /*
 UPLOAD SECURITY
 */
@@ -325,6 +315,7 @@ Add Product
 <form
 method="POST"
 enctype="multipart/form-data">
+<?= csrfField(); ?>
 
 <div class="mb-3">
 

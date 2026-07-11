@@ -3,6 +3,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
+require_once '../includes/csrf.php';
 
 requireRole('super_admin');
 
@@ -127,6 +128,7 @@ Pending Registrations
 <div class="mb-3">
 
 <form method="POST">
+    <?= csrfField(); ?>
 
 <button
 name="approve_all"
@@ -142,6 +144,7 @@ Approve All
 
 
 <form method="POST">
+    <?= csrfField(); ?>
 
 <div class="card shadow">
 

@@ -5,6 +5,7 @@ require_once 'includes/auth.php';
 require_once 'config/database.php';
 
 require_once 'includes/logger.php';
+require_once 'includes/csrf.php';
 
 
 $message='';
@@ -13,6 +14,7 @@ $message='';
 if(
 $_SERVER['REQUEST_METHOD']==='POST'
 ){
+    verify_csrf();
 
 $email=
 trim(
@@ -220,7 +222,7 @@ $message
 <?php endif; ?>
 
 <form method="POST">
-
+<?= csrfField(); ?>
 <div class="mb-3">
 
 <label>

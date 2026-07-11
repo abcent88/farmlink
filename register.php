@@ -2,11 +2,14 @@
 
 require_once 'config/database.php';
 require_once 'includes/validation.php';
+require_once 'includes/csrf.php';
 
 $message = '';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    verify_csrf();
+
 
 $fullname = trim($_POST['fullname']);
 $email = trim($_POST['email']);
@@ -172,7 +175,7 @@ include 'includes/navbar.php';
 <?php endif; ?>
 
 <form method="POST">
-
+    <?= csrfField(); ?>
 <label>Full Name</label>
 
 <input

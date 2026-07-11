@@ -3,6 +3,7 @@
 require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
+require_once '../includes/csrf.php';
 
 requireRole('buyer');
 
@@ -27,7 +28,7 @@ appFail();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+ verify_csrf();
     $quantity = (float) $_POST['quantity'];
 
     if ($quantity > $product['quantity']) {
@@ -84,7 +85,7 @@ include '../includes/navbar.php';
     </p>
 
     <form method="POST">
-
+         <?= csrfField(); ?>
         <label class="form-label">
             Quantity Needed
         </label>

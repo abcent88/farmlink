@@ -1,4 +1,5 @@
 <form method="POST"
+<?= csrfField(); ?>
       action="delete_user.php"
       style="display:inline;">
 

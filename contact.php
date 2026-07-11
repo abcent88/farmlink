@@ -1,6 +1,7 @@
 <?php include 'includes/header.php'; ?>
 
 <?php include 'includes/navbar.php'; ?>
+<?php require_once 'includes/csrf.php'; ?>
 
 <div class="container mt-5">
 
@@ -134,7 +135,7 @@ Send a Message
 
 <form
 method="POST">
-
+<?= csrfField(); ?>
 <div class="mb-3">
 
 <label class="form-label">
