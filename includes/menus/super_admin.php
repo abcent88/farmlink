@@ -1,54 +1,37 @@
 <?php
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/dashboard.php",
-    "📊",
-    "Dashboard"
+    "Dashboard",
+    "bi bi-speedometer2"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/users.php",
-    "👥",
-    "Users"
+    "Users",
+    "bi bi-people"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/products.php",
-    "🌾",
-    "Products"
+    "Products",
+    "bi bi-box-seam"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/orders.php",
-    "📦",
-    "Orders"
+    "Orders",
+    "bi bi-cart-check"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/revenue.php",
-    "💰",
-    "Revenue"
+    "Revenue",
+    "bi bi-cash-stack"
 );
 
-?>
-
-<button
-    type="button"
-    class="nav-card border-0 bg-transparent"
-    data-bs-toggle="offcanvas"
-    data-bs-target="#adminMenu">
-
-    <span>☰</span>
-
-    <small>Menu</small>
-
-</button>
-<?php
-
-mobileLink(
+navLink(
     "/projects/farmlink/logout.php",
-    "🚪",
-    "Logout"
+    "Logout",
+    "bi bi-box-arrow-right"
 );
-
-?>

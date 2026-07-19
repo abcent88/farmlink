@@ -36,7 +36,7 @@ include '../includes/navbar.php';
 
         <div class="col-md-4 mb-4">
 
-            <div class="card h-100 shadow">
+            <div class="card product-card shadow">
 
                 <?php if(!empty($product['image'])): ?>
 

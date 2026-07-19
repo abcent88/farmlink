@@ -1,39 +1,31 @@
 <?php
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/lga_admin/lga_admin_dashboard.php",
-    "📍",
-    "Dashboard"
+    "Dashboard",
+    "bi bi-speedometer2"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/lga_admin/orders.php",
-    "📦",
-    "Orders"
+    "Orders",
+    "bi bi-box-seam"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/lga_admin/commissions.php",
-    "💰",
-    "Commission"
+    "Commission",
+    "bi bi-cash-stack"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/admin/lga_admin/list.php",
-    "👥",
-    "LGA Admins"
+    "LGA Admins",
+    "bi bi-people"
 );
 
-?>
-
-<button
-type="button"
-class="nav-card border-0 bg-transparent"
-data-bs-toggle="offcanvas"
-data-bs-target="#lgaAdminMenu">
-
-<span>☰</span>
-
-<small>More</small>
-
-</button>
+navLink(
+    "/projects/farmlink/logout.php",
+    "Logout",
+    "bi bi-box-arrow-right"
+);

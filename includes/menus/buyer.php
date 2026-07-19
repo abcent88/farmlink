@@ -1,39 +1,31 @@
 <?php
 
-mobileLink(
+navLink(
     "/projects/farmlink/buyer/dashboard.php",
-    "🏠",
-    "Home"
+    "Home",
+    "bi bi-house"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/buyer/marketplace.php",
-    "🛒",
-    "Market"
+    "Market",
+    "bi bi-cart"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/buyer/orders.php",
-    "📦",
-    "Orders"
+    "Orders",
+    "bi bi-box-seam"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/buyer/purchase_history.php",
-    "📄",
-    "History"
+    "History",
+    "bi bi-clock-history"
 );
 
-?>
-
-<button
-    type="button"
-    class="nav-card border-0 bg-transparent"
-    data-bs-toggle="offcanvas"
-    data-bs-target="#buyerMenu">
-
-    <span>☰</span>
-
-    <small>Menu</small>
-
-</button>
+navLink(
+    "/projects/farmlink/logout.php",
+    "Logout",
+    "bi bi-box-arrow-right"
+);

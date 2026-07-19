@@ -1,49 +1,31 @@
 <?php
 
-mobileLink(
+navLink(
     "/projects/farmlink/investor/dashboard.php",
-    "🏦",
-    "Dashboard"
+    "Dashboard",
+    "bi bi-bank"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/investor/earnings.php",
-    "💵",
-    "Earnings"
+    "Earnings",
+    "bi bi-cash-stack"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/investor/reports.php",
-    "📊",
-    "Reports"
+    "Reports",
+    "bi bi-bar-chart"
 );
 
-mobileLink(
+navLink(
     "/projects/farmlink/notifications.php",
-    "🔔",
-    "Alerts"
+    "Alerts",
+    "bi bi-bell"
 );
 
-?>
-
-<a
-class="nav-card"
-href="#"
-data-bs-toggle="offcanvas"
-data-bs-target="#investorMenu">
-
-<span>☰</span>
-
-<small>More</small>
-
-</a>
-
-<?php
-
-mobileLink(
+navLink(
     "/projects/farmlink/logout.php",
-    "🚪",
-    "Logout"
+    "Logout",
+    "bi bi-box-arrow-right"
 );
-
-?>

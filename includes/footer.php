@@ -1,128 +1,69 @@
-<footer class="footer mt-5">
+<footer class="footer bg-dark text-light mt-5">
 
-    <div class="container">
+    <div class="container py-5">
 
-        <div class="row gy-4">
+        <div class="row">
 
-            <!-- Brand -->
+            <div class="col-lg-4 mb-4">
 
-            <div class="col-lg-4">
-
-                <h3 class="fw-bold mb-3">
-                    🌱 FarmLink
-                </h3>
+                <h4 class="text-success">
+                    🌾 FarmLink
+                </h4>
 
                 <p>
-                    FarmLink is a digital agricultural marketplace connecting
-                    farmers, buyers, investors, truckers and agricultural
-                    stakeholders across Nigeria.
+                    Connecting farmers, buyers and truckers across Nigeria through a secure agricultural marketplace.
                 </p>
-
-                <div class="mt-3">
-
-                    <a href="#" class="footer-icon">
-                        <i class="bi bi-facebook"></i>
-                    </a>
-
-                    <a href="#" class="footer-icon">
-                        <i class="bi bi-twitter-x"></i>
-                    </a>
-
-                    <a href="#" class="footer-icon">
-                        <i class="bi bi-instagram"></i>
-                    </a>
-
-                    <a href="#" class="footer-icon">
-                        <i class="bi bi-linkedin"></i>
-                    </a>
-
-                </div>
 
             </div>
 
-            <!-- Quick Links -->
-
-            <div class="col-lg-2 col-md-4">
+            <div class="col-lg-2 col-md-6 mb-4">
 
                 <h5>Quick Links</h5>
 
-                <ul class="footer-links">
+                <ul class="list-unstyled">
 
-                    <li><a href="/projects/farmlink/index.php">Home</a></li>
-
-                    <li><a href="/projects/farmlink/about.php">About</a></li>
-
-                    <li><a href="/projects/farmlink/contact.php">Contact</a></li>
-
-                    <li><a href="/projects/farmlink/register.php">Register</a></li>
-
-                    <li><a href="/projects/farmlink/login.php">Login</a></li>
+                    <li><a href="/projects/farmlink/" class="footer-link">Home</a></li>
+                    <li><a href="#products" class="footer-link">Products</a></li>
+                    <li><a href="/projects/farmlink/register.php" class="footer-link">Register</a></li>
+                    <li><a href="/projects/farmlink/login.php" class="footer-link">Login</a></li>
 
                 </ul>
 
             </div>
 
-            <!-- Resources -->
-
-            <div class="col-lg-3 col-md-4">
-
-                <h5>Resources</h5>
-
-                <ul class="footer-links">
-
-                    <li><a href="#">Help Centre</a></li>
-
-                    <li><a href="#">Privacy Policy</a></li>
-
-                    <li><a href="#">Terms & Conditions</a></li>
-
-                    <li><a href="#">FAQ</a></li>
-
-                    <li><a href="#">Support</a></li>
-
-                </ul>
-
-            </div>
-
-            <!-- Contact -->
-
-            <div class="col-lg-3 col-md-4">
+            <div class="col-lg-3 col-md-6 mb-4">
 
                 <h5>Contact</h5>
 
-                <p>
-                    <i class="bi bi-geo-alt-fill"></i>
-                    Abuja, Nigeria
-                </p>
+                <p>📧 support@farmlink.ng</p>
+
+                <p>📞 +234 XXX XXX XXXX</p>
+
+                <p>📍 Nigeria</p>
+
+            </div>
+
+            <div class="col-lg-3">
+
+                <h5>Stay Updated</h5>
 
                 <p>
-                    <i class="bi bi-envelope-fill"></i>
-                    support@farmlink.com
+                    Subscribe for agricultural news and marketplace updates.
                 </p>
 
-                <p>
-                    <i class="bi bi-telephone-fill"></i>
-                    +234 XXX XXX XXXX
-                </p>
+                <form>
 
-                <form class="mt-3">
+                    <input
+                        type="email"
+                        class="form-control mb-2"
+                        placeholder="Email address">
 
-                    <div class="input-group">
+                    <button
+                        class="btn btn-success w-100">
 
-                        <input
-                            type="email"
-                            class="form-control"
-                            placeholder="Email">
+                        Subscribe
 
-                        <button
-                            class="btn btn-warning"
-                            type="button">
-
-                            Subscribe
-
-                        </button>
-
-                    </div>
+                    </button>
 
                 </form>
 
@@ -130,43 +71,18 @@
 
         </div>
 
-        <hr>
+        <hr class="border-secondary">
 
-        <div class="row">
+        <div class="text-center">
 
-            <div class="col-md-6">
-
-                <small>
-
-                    © <?= date('Y') ?>
-
-                    FarmLink.
-
-                    All Rights Reserved.
-
-                </small>
-
-            </div>
-
-            <div class="col-md-6 text-md-end">
-
-                <small>
-
-                    Version 1.0 |
-                    Powered by FarmLink Technologies
-
-                </small>
-
-            </div>
+            © <?= date('Y') ?> FarmLink. All Rights Reserved.
 
         </div>
 
     </div>
 
 </footer>
-
-<script src="/projects/farmlink/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/projects/farmlink/assets/js/theme.js"></script>
-
+<script src="<?= $base ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= $base ?>/assets/js/theme.js"></script>
 </body>
 </html>

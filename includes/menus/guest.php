@@ -1,31 +1,34 @@
-<?php
+<li class="nav-item">
+    <a class="nav-link" href="/projects/farmlink/index.php">
+        <i class="bi bi-house me-1"></i>
+        Home
+    </a>
+</li>
 
-navLink(
-"/projects/farmlink/index.php",
-"Home",
-"bi bi-house"
-);
+<li class="nav-item">
+    <a class="nav-link" href="/projects/farmlink/about.php">
+        <i class="bi bi-info-circle me-1"></i>
+        About
+    </a>
+</li>
 
-navLink(
-"/projects/farmlink/about.php",
-"About",
-"bi bi-info-circle"
-);
+<li class="nav-item">
+    <a class="nav-link" href="/projects/farmlink/contact.php">
+        <i class="bi bi-envelope me-1"></i>
+        Contact
+    </a>
+</li>
 
-navLink(
-"/projects/farmlink/contact.php",
-"Contact",
-"bi bi-envelope"
-);
+<li class="nav-item">
+    <a class="nav-link" href="/projects/farmlink/login.php">
+        <i class="bi bi-box-arrow-in-right me-1"></i>
+        Login
+    </a>
+</li>
 
-navLink(
-"/projects/farmlink/login.php",
-"Login",
-"bi bi-box-arrow-in-right"
-);
-
-navLink(
-"/projects/farmlink/register.php",
-"Register",
-"bi bi-person-plus"
-);
+<li class="nav-item">
+    <a class="nav-link" href="/projects/farmlink/register.php">
+        <i class="bi bi-person-plus me-1"></i>
+        Register
+    </a>
+</li>

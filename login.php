@@ -1,287 +1,208 @@
 <?php
 
 require_once 'includes/auth.php';
-
 require_once 'config/database.php';
-
 require_once 'includes/logger.php';
 require_once 'includes/csrf.php';
 
+$message = '';
 
-$message='';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-
-if(
-$_SERVER['REQUEST_METHOD']==='POST'
-){
     verify_csrf();
 
-$email=
-trim(
-$_POST['email']
-);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
 
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM users
+        WHERE email = ?
+        LIMIT 1
+    ");
 
-$password=
-$_POST['password'];
+    $stmt->execute([$email]);
 
+    $user = $stmt->fetch();
 
-$stmt=
-$pdo->prepare(
+    if (!$user) {
 
-"
+        $message = 'User not found';
 
-SELECT *
+    } elseif ($user['status'] !== 'active') {
 
-FROM users
+        $message = 'Account awaiting approval.';
 
-WHERE email=?
+    } elseif (!password_verify($password, $user['password'])) {
 
-LIMIT 1
+        $message = 'Invalid password';
 
-"
+    } else {
 
-);
+        session_regenerate_id(true);
 
+        $_SESSION['user_id']  = $user['id'];
+        $_SESSION['fullname'] = $user['fullname'];
+        $_SESSION['role']     = $user['role'];
 
-$stmt->execute([
-$email
-]);
+        logActivity(
+            $pdo,
+            $user['id'],
+            'Login',
+            'User signed into FarmLink'
+        );
 
+        switch ($user['role']) {
 
-$user=
-$stmt->fetch();
+            case 'super_admin':
+                $redirect = 'admin/dashboard.php';
+                break;
 
+            case 'lga_admin':
+                $redirect = 'admin/lga_admin/lga_admin_dashboard.php';
+                break;
 
-if($user){
+            case 'farmer':
+                $redirect = 'farmer/dashboard.php';
+                break;
 
-if(
-$user['status']!=='active'
-){
+            case 'buyer':
+                $redirect = 'buyer/dashboard.php';
+                break;
 
-$message=
-'Account awaiting approval.';
+            case 'trucker':
+                $redirect = 'trucker/dashboard.php';
+                break;
 
+            case 'investor':
+                $redirect = 'investor/dashboard.php';
+                break;
 
-}elseif(
-password_verify(
-$password,
-$user['password']
-)
-){
+            default:
+                $redirect = 'index.php';
+                break;
+        }
 
-session_regenerate_id(
-true
-);
-
-
-$_SESSION['user_id']=
-$user['id'];
-
-$_SESSION['fullname']=
-$user['fullname'];
-
-$_SESSION['role']=
-$user['role'];
-
-
-/*
-Log activity BEFORE redirect
-*/
-
-logActivity(
-
-$pdo,
-
-$user['id'],
-
-'Login',
-
-'User signed into FarmLink'
-
-);
-
-
-$redirect='index.php';
-
-
-switch(
-$user['role']
-){
-
-case 'super_admin':
-
-$redirect=
-'admin/dashboard.php';
-
-break;
-
-
-case 'lga_admin':
-
-$redirect=
-'admin/lga_admin/lga_admin_dashboard.php';
-
-break;
-
-
-case 'farmer':
-
-$redirect=
-'farmer/dashboard.php';
-
-break;
-
-
-case 'buyer':
-
-$redirect=
-'buyer/dashboard.php';
-
-break;
-
-
-case 'trucker':
-
-$redirect=
-'trucker/dashboard.php';
-
-break;
-
-
-case 'investor':
-
-$redirect=
-'investor/dashboard.php';
-
-break;
-
-}
-
-
-header(
-"Location: $redirect"
-);
-
-exit;
-
-
-}else{
-
-$message=
-'Invalid password';
-
-}
-
-
-}else{
-
-$message=
-'User not found';
-
-}
-
+        header("Location: $redirect");
+        exit;
+    }
 }
 
 ?>
 
 <?php include 'includes/header.php'; ?>
-
 <?php include 'includes/navbar.php'; ?>
 
-<div class="container mt-5">
+<div class="container py-5">
 
-<div class="row justify-content-center">
+    <div class="row justify-content-center">
 
-<div class="col-md-5">
+        <div class="col-lg-5 col-md-7">
 
-<div class="card shadow">
+            <div class="card shadow border-0">
 
-<div class="card-header bg-success text-white">
+                <div class="card-header bg-success text-white text-center">
 
-<h3>
+                    <h3 class="mb-0">
+                        Login to FarmLink
+                    </h3>
 
-Login
+                </div>
 
-</h3>
+                <div class="card-body p-4">
 
-</div>
+                    <?php if (!empty($message)): ?>
 
-<div class="card-body">
+                        <div class="alert alert-warning">
 
-<?php if($message): ?>
+                            <?= htmlspecialchars($message) ?>
 
-<div class="alert alert-warning">
+                        </div>
 
-<?= htmlspecialchars(
-$message
-) ?>
+                    <?php endif; ?>
 
-</div>
+                    <form method="POST">
 
-<?php endif; ?>
+                        <?= csrfField(); ?>
 
-<form method="POST">
-<?= csrfField(); ?>
-<div class="mb-3">
+                        <div class="mb-3">
 
-<label>
+                            <label class="form-label">
 
-Email
+                                Email Address
 
-</label>
+                            </label>
 
-<input
-type="email"
-name="email"
-class="form-control"
-required>
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control"
+                                required
+                                autofocus>
 
-</div>
+                        </div>
 
-<div class="mb-3">
+                        <div class="mb-3">
 
-<label>
+                            <label class="form-label">
 
-Password
+                                Password
 
-</label>
+                            </label>
 
-<input
-type="password"
-name="password"
-class="form-control"
-required>
+                            <input
+                                type="password"
+                                name="password"
+                                class="form-control"
+                                required>
 
-</div>
+                        </div>
 
-<button
-type="submit"
-class="btn btn-success w-100">
+                        <button
+                            type="submit"
+                            class="btn btn-success w-100">
 
-Login
+                            Login
 
-</button>
+                        </button>
 
-<div class="mt-3">
+                    </form>
 
-<a href="forgot_password.php">
+                    <div class="text-center mt-3">
 
-Forgot Password?
+                        <a
+                            href="forgot_password.php"
+                            class="text-success text-decoration-none">
 
-</a>
+                            Forgot Password?
 
-</div>
+                        </a>
 
-</form>
+                    </div>
 
-</div>
+                    <hr>
 
-</div>
+                    <div class="text-center">
 
-</div>
+                        Don't have an account?
 
-</div>
+                        <a
+                            href="register.php"
+                            class="text-success text-decoration-none fw-bold">
+
+                            Register
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 

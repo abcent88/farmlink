@@ -15,15 +15,15 @@ header('X-XSS-Protection: 1; mode=block');
 
 <title>FarmLink</title>
 
-<link rel="stylesheet" href="/projects/farmlink/assets/vendor/bootstrap/css/bootstrap.min.css">
+<?php
+$base = "/projects/farmlink";
+?>
 
+<link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<link rel="stylesheet" href="/projects/farmlink/assets/css/style.css">
-
-<link rel="stylesheet" href="/projects/farmlink/assets/css/theme.css">
-
-<link rel="stylesheet" href="/projects/farmlink/assets/css/navbar.css">
+<link rel="stylesheet" href="<?= $base ?>/assets/css/style.css">
+<link rel="stylesheet" href="<?= $base ?>/assets/css/theme.css">
+<link rel="stylesheet" href="<?= $base ?>/assets/css/navbar.css">
 
 </head>
 

@@ -12,7 +12,7 @@ if (!function_exists('navLink')) {
         <li class="nav-item">
             <a class="nav-link" href="'.$href.'">';
 
-        if($icon){
+        if ($icon) {
             echo '<i class="'.$icon.' me-1"></i>';
         }
 
@@ -27,7 +27,7 @@ if (!function_exists('navLink')) {
 
 if (!function_exists('mobileLink')) {
 
-    function mobileLink($href,$icon,$title)
+    function mobileLink($href, $icon, $title)
     {
         echo '
         <a class="nav-card" href="'.$href.'">
@@ -188,5 +188,3 @@ if (isset($_SESSION['role'])) {
 }
 
 ?>
-
-<script src="/projects/farmlink/assets/js/theme.js"></script>
