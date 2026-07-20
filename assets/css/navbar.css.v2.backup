@@ -1,0 +1,86 @@
+:root{
+    --nav-green:#198754;
+}
+
+/* ===========================
+   NAVBAR
+=========================== */
+
+.navbar{
+    background:var(--nav-green)!important;
+}
+
+.navbar-brand{
+    color:#fff!important;
+    font-weight:700;
+    font-size:1.4rem;
+}
+
+.navbar-nav .nav-link{
+    color:#fff!important;
+    font-weight:500;
+    padding:.7rem 1rem;
+    transition:.3s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active{
+    color:#d8ffe6!important;
+}
+
+.navbar-toggler{
+    border:none;
+}
+
+.navbar-toggler:focus{
+    box-shadow:none;
+}
+
+/* ===========================
+   MOBILE MENU
+=========================== */
+
+@media (max-width:991.98px){
+
+    .navbar-collapse{
+        margin-top:12px;
+        padding:15px;
+        border-radius:12px;
+        background:#198754;
+    }
+
+    .navbar-nav{
+        gap:6px;
+    }
+
+    .navbar-nav .nav-link{
+        padding:12px;
+        border-radius:8px;
+    }
+
+    .navbar-nav .nav-link:hover{
+        background:rgba(255,255,255,.15);
+    }
+
+    .btn-outline-light{
+        width:100%;
+        margin-top:10px;
+    }
+
+}
+
+/* ===========================
+   DESKTOP
+=========================== */
+
+@media (min-width:992px){
+
+    .navbar-nav{
+        align-items:center;
+    }
+
+    .navbar-nav.ms-auto{
+        margin-left:auto;
+    }
+
+}
