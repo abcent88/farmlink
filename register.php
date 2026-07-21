@@ -18,6 +18,9 @@ $role = trim($_POST['role']);
 $lga = trim($_POST['lga']);
 $town = trim($_POST['town']);
 $password = $_POST['password'];
+if ($password !== $confirmPassword) {
+    $errors[] = "Passwords do not match.";
+}
 
 $truckType =
 $_POST['truck_type'] ?? null;
@@ -32,20 +35,24 @@ $phone,
 $password
 );
 
+/* Check duplicate email */
+
 $check =
 $pdo->prepare(
-"SELECT id FROM users WHERE email=?"
+"SELECT id FROM users WHERE email=? OR phone=?"
 );
 
-$check->execute([$email]);
+$check->execute([
+    $email,
+    $phone
+]);
 
-if($check->rowCount()>0){
+if($row = $check->fetch()){
 
-$errors[] =
-"Email already exists.";
+    $errors[] =
+    "Email address or phone number already exists.";
 
 }
-
 if(empty($errors)){
 
 try{
@@ -182,6 +189,7 @@ include 'includes/navbar.php';
 type="text"
 name="fullname"
 class="form-control"
+value="<?= htmlspecialchars($fullname ?? '') ?>"
 required>
 
 <br>
@@ -235,11 +243,69 @@ Trucker
 
 <label>Password</label>
 
+<div class="input-group">
+
 <input
 type="password"
 name="password"
+id="password"
 class="form-control"
 required>
+
+<button
+class="btn btn-outline-secondary"
+type="button"
+id="togglePassword">
+
+👁
+
+</button>
+
+
+</div>
+<div class="progress mt-2">
+
+<div
+id="passwordStrengthBar"
+class="progress-bar"
+style="width:0%">
+
+</div>
+
+</div>
+
+<small
+id="passwordStrengthText"
+class="form-text text-muted">
+
+Password Strength
+
+</small>
+
+<br>
+<label>Confirm Password</label>
+
+<div class="input-group">
+
+<input
+type="password"
+name="confirm_password"
+id="confirm_password"
+class="form-control"
+required>
+
+<button
+class="btn btn-outline-secondary"
+type="button"
+id="toggleConfirmPassword">
+
+👁
+
+</button>
+
+</div>
+
+<small id="passwordMatch"></small>
 
 <br>
 
@@ -376,78 +442,172 @@ Register
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
 
-document.addEventListener(
-'DOMContentLoaded',
-function(){
+    // Form Elements
+    const role = document.querySelector('[name="role"]');
+    const truckFields = document.getElementById('truckFields');
+    const truckType = document.getElementById('truck_type');
+    const capacity = document.getElementById('truck_capacity');
 
-let role =
-document.querySelector(
-'[name="role"]'
-);
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
 
-let truckFields =
-document.getElementById(
-'truckFields'
-);
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
 
-let truckType =
-document.getElementById(
-'truck_type'
-);
+    const passwordMatch = document.getElementById('passwordMatch');
 
-let capacity =
-document.getElementById(
-'truck_capacity'
-);
+    const strengthBar = document.getElementById('passwordStrengthBar');
+    const strengthText = document.getElementById('passwordStrengthText');
 
-function toggleTruck(){
+    // ===========================
+    // Trucker Fields
+    // ===========================
 
-if(
-role.value==='trucker'
-){
+    function toggleTruck() {
 
-truckFields.style.display='block';
+        if (role.value === 'trucker') {
 
-}else{
+            truckFields.style.display = 'block';
 
-truckFields.style.display='none';
+        } else {
 
-truckType.value='';
+            truckFields.style.display = 'none';
+            truckType.value = '';
+            capacity.value = '';
 
-capacity.value='';
+        }
 
-}
+    }
 
-}
+    function loadCapacity() {
 
-function loadCapacity(){
+        const selected = truckType.options[truckType.selectedIndex];
 
-let selected =
-truckType.options[
-truckType.selectedIndex
-];
+        capacity.value = selected.dataset.capacity || '';
 
-capacity.value =
-selected.dataset.capacity
-|| '';
+    }
 
-}
+    toggleTruck();
 
-toggleTruck();
+    role.addEventListener('change', toggleTruck);
 
-role.addEventListener(
-'change',
-toggleTruck
-);
+    truckType.addEventListener('change', loadCapacity);
 
-truckType.addEventListener(
-'change',
-loadCapacity
-);
+    // ===========================
+    // Show / Hide Password
+    // ===========================
+
+    togglePassword.addEventListener('click', function () {
+
+        password.type =
+            password.type === 'password'
+                ? 'text'
+                : 'password';
+
+    });
+
+    toggleConfirmPassword.addEventListener('click', function () {
+
+        confirmPassword.type =
+            confirmPassword.type === 'password'
+                ? 'text'
+                : 'password';
+
+    });
+
+    // ===========================
+    // Password Match
+    // ===========================
+
+    function checkPasswordMatch() {
+
+        if (confirmPassword.value === '') {
+
+            passwordMatch.innerHTML = '';
+            return;
+
+        }
+
+        if (password.value === confirmPassword.value) {
+
+            passwordMatch.innerHTML = '✓ Passwords match';
+            passwordMatch.style.color = 'green';
+
+        } else {
+
+            passwordMatch.innerHTML = '✗ Passwords do not match';
+            passwordMatch.style.color = 'red';
+
+        }
+
+    }
+
+    password.addEventListener('keyup', checkPasswordMatch);
+    confirmPassword.addEventListener('keyup', checkPasswordMatch);
+
+    // ===========================
+    // Password Strength
+    // ===========================
+
+    function checkStrength() {
+
+        const value = password.value;
+
+        let score = 0;
+
+        if (value.length >= 8) score++;
+        if (/[A-Z]/.test(value)) score++;
+        if (/[a-z]/.test(value)) score++;
+        if (/[0-9]/.test(value)) score++;
+        if (/[^A-Za-z0-9]/.test(value)) score++;
+
+        switch (score) {
+
+            case 0:
+                strengthBar.style.width = '0%';
+                strengthBar.className = 'progress-bar';
+                strengthText.innerHTML = 'Password Strength';
+                break;
+
+            case 1:
+                strengthBar.style.width = '20%';
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.innerHTML = 'Weak';
+                break;
+
+            case 2:
+                strengthBar.style.width = '40%';
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.innerHTML = 'Fair';
+                break;
+
+            case 3:
+                strengthBar.style.width = '60%';
+                strengthBar.className = 'progress-bar bg-info';
+                strengthText.innerHTML = 'Good';
+                break;
+
+            case 4:
+                strengthBar.style.width = '80%';
+                strengthBar.className = 'progress-bar bg-primary';
+                strengthText.innerHTML = 'Strong';
+                break;
+
+            case 5:
+                strengthBar.style.width = '100%';
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.innerHTML = 'Very Strong';
+                break;
+
+        }
+
+    }
+
+    password.addEventListener('keyup', checkStrength);
 
 });
-
 </script>
 
 <?php include 'includes/footer.php'; ?>

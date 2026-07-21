@@ -22,14 +22,15 @@ function validateRegistration(
     }
 
     if (strlen($password) < 8) {
-        $errors[] = "Password must be at least 8 characters long.";
+        $errors[] = "Password must contain uppercase, lowercase, a number and a special character.";
     }
 
     if (
-        !preg_match('/[A-Z]/', $password) ||
-        !preg_match('/[a-z]/', $password) ||
-        !preg_match('/[0-9]/', $password)
-    ) {
+    !preg_match('/[A-Z]/', $password) ||
+    !preg_match('/[a-z]/', $password) ||
+    !preg_match('/[0-9]/', $password) ||
+    !preg_match('/[^A-Za-z0-9]/', $password)
+){
         $errors[] =
             "Password must contain uppercase, lowercase and a number.";
     }
