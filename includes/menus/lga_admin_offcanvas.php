@@ -20,7 +20,7 @@
 
         <div class="list-group">
 
-            <a href="/projects/farmlink/notifications.php"
+            <a href="/projects/farmlink/admin/notifications.php"
                class="list-group-item list-group-item-action">
                 🔔 Notifications
             </a>

@@ -1,10 +1,22 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
+
 mobileLink(
     "/projects/farmlink/trucker/dashboard.php",
-    "🚚",
-    "Home"
+    "🏠",
+    "Dashboard"
 );
+
+/*
+|--------------------------------------------------------------------------
+| Available Deliveries
+|--------------------------------------------------------------------------
+*/
 
 mobileLink(
     "/projects/farmlink/trucker/deliveries.php",
@@ -12,16 +24,28 @@ mobileLink(
     "Available"
 );
 
-mobileLink(
-    "/projects/farmlink/trucker/my_deliveries.php",
-    "📦",
-    "My Jobs"
-);
+/*
+|--------------------------------------------------------------------------
+| My Deliveries
+|--------------------------------------------------------------------------
+*/
 
 mobileLink(
-    "/projects/farmlink/trucker/routes.php",
-    "📍",
-    "Routes"
+    "/projects/farmlink/trucker/my_deliveries.php",
+    "🚚",
+    "My Deliveries"
+);
+
+/*
+|--------------------------------------------------------------------------
+| Notifications
+|--------------------------------------------------------------------------
+*/
+
+mobileLink(
+    "/projects/farmlink/trucker/notifications.php",
+    "🔔",
+    "Alerts"
 );
 
 ?>

@@ -64,7 +64,8 @@ SELECT
     p.*,
     u.fullname AS farmer_name,
     u.lga,
-    u.town
+    u.town,
+    u.status AS farmer_status
 FROM products p
 INNER JOIN users u
     ON u.id = p.farmer_id
@@ -121,11 +122,14 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt = $pdo->query("
 SELECT
     p.*,
-    u.fullname AS farmer_name
+    u.fullname AS farmer_name,
+    u.lga,
+    u.town,
+    u.status AS farmer_status
 FROM products p
 INNER JOIN users u
     ON u.id = p.farmer_id
-WHERE p.status = 'approved'
+WHERE p.status='approved'
 ORDER BY p.created_at DESC
 LIMIT 4
 ");
@@ -140,16 +144,26 @@ $featuredProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 */
 
 $stmt = $pdo->query("
-SELECT DISTINCT category
+SELECT
+
+category,
+
+COUNT(*) AS total
+
 FROM products
+
 WHERE
-    status='approved'
-    AND category IS NOT NULL
-    AND category <> ''
-ORDER BY category
+
+status='approved'
+
+AND category<>''
+
+GROUP BY category
+
+ORDER BY total DESC
 ");
 
-$categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 /*
 |--------------------------------------------------------------------------

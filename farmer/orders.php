@@ -7,143 +7,239 @@ require_once '../includes/roles.php';
 requireRole('farmer');
 
 $stmt = $pdo->prepare("
-    SELECT
-        o.*,
-        p.product_name,
-        u.fullname AS buyer_name
-    FROM orders o
-    JOIN products p
-        ON o.product_id = p.id
-    JOIN users u
-        ON o.buyer_id = u.id
-    WHERE p.farmer_id = ?
-    ORDER BY o.id DESC
+
+SELECT
+
+o.*,
+
+u.fullname AS buyer_name,
+
+u.phone,
+
+u.email,
+
+p.product_name,
+
+p.image,
+
+p.unit
+
+FROM orders o
+
+JOIN users u
+ON o.buyer_id=u.id
+
+JOIN products p
+ON o.product_id=p.id
+
+WHERE o.farmer_id=?
+
+ORDER BY o.created_at DESC
+
 ");
 
 $stmt->execute([
     $_SESSION['user_id']
 ]);
 
-$orders = $stmt->fetchAll();
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include '../includes/header.php';
 include '../includes/navbar.php';
+
 ?>
 
 <div class="container mt-5">
 
-```
-<h2>Order Requests</h2>
+<h2 class="mb-4">
+Incoming Orders
+</h2>
+<?php if(empty($orders)): ?>
 
-<table class="table table-bordered">
+<div class="alert alert-info">
 
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Buyer</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+No orders have been received yet.
 
-    <tbody>
+</div>
 
-    <?php foreach($orders as $order): ?>
+<?php else: ?>
 
-        <tr>
+<div class="table-responsive">
 
-            <td><?= $order['id'] ?></td>
+<table class="table table-bordered table-hover align-middle">
 
-            <td>
-                <?= htmlspecialchars($order['buyer_name']) ?>
-            </td>
+<thead class="table-success">
 
-            <td>
-                <?= htmlspecialchars($order['product_name']) ?>
-            </td>
+<tr>
 
-            <td>
-                <?= $order['quantity'] ?>
-            </td>
+<th>#</th>
 
-            <td>
-                <?php if($order['status'] == 'pending'): ?>
+<th>Product</th>
 
-    <span class="badge bg-warning text-dark">
-        Pending
-    </span>
+<th>Buyer</th>
 
-<<?php elseif($order['status'] == 'farmer_approved'): ?>
+<th>Quantity</th>
 
-    <span class="badge bg-info">
-        Awaiting LGA Approval
-    </span>
+<th>Total</th>
 
-<?php elseif($order['status'] == 'accepted'): ?>
+<th>Status</th>
 
-    <span class="badge bg-primary">
-        Approved By LGA
-    </span>
-<?php elseif($order['status'] == 'rejected'): ?>
+<th>Date</th>
 
-    <span class="badge bg-danger">
-        Rejected
-    </span>
+<th>Action</th>
 
-<?php elseif($order['status'] == 'completed'): ?>
+</tr>
 
-    <span class="badge bg-success">
-        Completed
-    </span>
+</thead>
 
-<?php endif; ?>
-            </td>
+<tbody>
 
-            <td>
+<?php foreach($orders as $order): ?>
 
-    <?php if($order['status'] == 'pending'): ?>
+<tr>
 
-        <a
-            href="accept_order.php?id=<?= $order['id'] ?>"
-            class="btn btn-success btn-sm">
-            Accept
-        </a>
+<td><?= $order['id'] ?></td>
 
-        <a
-            href="reject_order.php?id=<?= $order['id'] ?>"
-            class="btn btn-danger btn-sm">
-            Reject
-        </a>
+<td>
 
-    <?php elseif($order['status'] == 'farmer_approved'): ?>
+<strong>
 
-    <button
-        class="btn btn-secondary btn-sm"
-        disabled>
-        Awaiting LGA Approval
-    </button>
+<?= htmlspecialchars($order['product_name']) ?>
 
-<?php elseif($order['status'] == 'accepted'): ?>
+</strong>
 
-    <a
-        href="create_delivery.php?order_id=<?= $order['id'] ?>"
-        class="btn btn-primary btn-sm">
-        Assign Truck
-    </a>
+</td>
+
+<td>
+
+<?= htmlspecialchars($order['buyer_name']) ?>
+
+<br>
+
+<small>
+
+<?= htmlspecialchars($order['phone']) ?>
+
+</small>
+
+</td>
+
+<td>
+
+<?= number_format($order['quantity']) ?>
+
+<?= htmlspecialchars($order['unit']) ?>
+
+</td>
+
+<td>
+
+₦<?= number_format($order['total_amount'],2) ?>
+
+</td>
+
+<td>
+
+<?php
+
+switch ($order['status']) {
+
+    case 'pending':
+
+        echo '<span class="badge bg-warning">Pending</span>';
+
+        break;
+
+    case 'farmer_approved':
+
+        echo '<span class="badge bg-info">Awaiting LGA Approval</span>';
+
+        break;
+
+    case 'accepted':
+
+        echo '<span class="badge bg-primary">Awaiting Trucker</span>';
+
+        break;
+
+    case 'in_transit':
+
+        echo '<span class="badge bg-info">🚚 In Transit</span>';
+
+        break;
+
+    case 'delivered':
+
+        echo '<span class="badge bg-success">Delivered</span>';
+
+        break;
+
+    case 'completed':
+
+        echo '<span class="badge bg-dark">Completed</span>';
+
+        break;
+
+    case 'rejected':
+
+        echo '<span class="badge bg-danger">Rejected</span>';
+
+        break;
+
+}
+?>
+
+</td>
+
+<td>
+
+<?= date('d M Y',strtotime($order['created_at'])) ?>
+
+</td>
+
+<td>
+
+<?php if($order['status']=='pending'): ?>
+
+<a
+
+href="accept_order.php?id=<?= $order['id'] ?>"
+
+class="btn btn-success btn-sm">
+
+Accept
+
+</a>
+
+<a
+
+href="reject_order.php?id=<?= $order['id'] ?>"
+
+class="btn btn-danger btn-sm">
+
+Reject
+
+</a>
+
+<?php else: ?>
+
+-
 
 <?php endif; ?>
 
 </td>
-        </tr>
 
-    <?php endforeach; ?>
+</tr>
 
-    </tbody>
+<?php endforeach; ?>
+
+</tbody>
 
 </table>
-```
+
+</div>
+
+<?php endif; ?>
 
 </div>
 

@@ -6,22 +6,53 @@ require_once '../includes/roles.php';
 
 requireRole('trucker');
 
+/*
+|--------------------------------------------------------------------------
+| Deliveries Approved By LGA
+|--------------------------------------------------------------------------
+*/
+
 $stmt = $pdo->prepare("
-    SELECT
-        d.*,
-        p.product_name
-    FROM deliveries d
-    JOIN orders o
-        ON d.order_id = o.id
-    JOIN products p
-        ON o.product_id = p.id
-    WHERE d.status = 'open'
-    ORDER BY d.id DESC
+SELECT
+    d.id,
+    d.order_id,
+    d.status,
+    d.created_at,
+
+    o.quantity,
+    o.total_amount,
+
+    p.product_name,
+    p.unit,
+
+    buyer.fullname  AS buyer_name,
+    buyer.phone     AS buyer_phone,
+
+    farmer.fullname AS farmer_name,
+    farmer.phone    AS farmer_phone
+
+FROM deliveries d
+
+JOIN orders o
+    ON o.id=d.order_id
+
+JOIN products p
+    ON p.id=o.product_id
+
+JOIN users buyer
+    ON buyer.id=o.buyer_id
+
+JOIN users farmer
+    ON farmer.id=o.farmer_id
+
+WHERE d.status='approved'
+
+ORDER BY d.created_at DESC
 ");
 
 $stmt->execute();
 
-$deliveries = $stmt->fetchAll();
+$deliveries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include '../includes/header.php';
 include '../includes/navbar.php';
@@ -29,68 +60,153 @@ include '../includes/navbar.php';
 
 <div class="container mt-5">
 
-```
-<h2>Available Deliveries</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-<table class="table table-bordered">
+<h2>
 
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Product</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+Available Deliveries
 
-    <tbody>
+</h2>
 
-    <?php foreach($deliveries as $delivery): ?>
+<span class="badge bg-success fs-6">
 
-        <tr>
+<?= count($deliveries) ?> Available
 
-            <td><?= $delivery['id'] ?></td>
+</span>
 
-            <td><?= htmlspecialchars($delivery['product_name']) ?></td>
+</div>
 
-            <td><?php if($delivery['status'] == 'open'): ?>
+<?php if(empty($deliveries)): ?>
 
-    <span class="badge bg-warning text-dark">
-        Open
-    </span>
+<div class="alert alert-info">
 
-<?php elseif($delivery['status'] == 'accepted'): ?>
+No deliveries are available at the moment.
 
-    <span class="badge bg-info">
-        Accepted
-    </span>
+</div>
 
-<?php elseif($delivery['status'] == 'completed'): ?>
+<?php else: ?>
 
-    <span class="badge bg-success">
-        Completed
-    </span>
+<div class="table-responsive">
 
-<?php endif; ?></td>
+<table class="table table-bordered table-hover align-middle">
 
-            <td>
+<thead class="table-success">
 
-                <a
-                    href="accept_delivery.php?id=<?= $delivery['id'] ?>"
-                    class="btn btn-success btn-sm">
-                    Accept Delivery
-                </a>
+<tr>
 
-            </td>
+<th>Delivery</th>
 
-        </tr>
+<th>Order</th>
 
-    <?php endforeach; ?>
+<th>Product</th>
 
-    </tbody>
+<th>Farmer</th>
+
+<th>Buyer</th>
+
+<th>Quantity</th>
+
+<th>Total</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<?php foreach($deliveries as $delivery): ?>
+
+<tr>
+
+<td>
+
+#<?= $delivery['id'] ?>
+
+</td>
+
+<td>
+
+#<?= $delivery['order_id'] ?>
+
+</td>
+
+<td>
+
+<strong>
+
+<?= htmlspecialchars($delivery['product_name']) ?>
+
+</strong>
+
+</td>
+
+<td>
+
+<?= htmlspecialchars($delivery['farmer_name']) ?>
+
+<br>
+
+<small>
+
+<?= htmlspecialchars($delivery['farmer_phone']) ?>
+
+</small>
+
+</td>
+
+<td>
+
+<?= htmlspecialchars($delivery['buyer_name']) ?>
+
+<br>
+
+<small>
+
+<?= htmlspecialchars($delivery['buyer_phone']) ?>
+
+</small>
+
+</td>
+
+<td>
+
+<?= number_format($delivery['quantity']) ?>
+
+<?= htmlspecialchars($delivery['unit']) ?>
+
+</td>
+
+<td>
+
+₦<?= number_format($delivery['total_amount'],2) ?>
+
+</td>
+
+<td>
+
+<a
+href="accept_delivery.php?id=<?= $delivery['id'] ?>"
+class="btn btn-success btn-sm">
+
+Accept Delivery
+
+</a>
+
+</td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</tbody>
 
 </table>
-```
+
+</div>
+
+<?php endif; ?>
 
 </div>
 

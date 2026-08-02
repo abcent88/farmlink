@@ -44,7 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id']  = $user['id'];
         $_SESSION['fullname'] = $user['fullname'];
         $_SESSION['role']     = $user['role'];
-
+        $_SESSION['email'] = $user['email'];
+$_SESSION['phone'] = $user['phone'];
+$_SESSION['lga'] = $user['lga'];
+$_SESSION['town'] = $user['town'];
+$_SESSION['status'] = $user['status'];
         logActivity(
             $pdo,
             $user['id'],

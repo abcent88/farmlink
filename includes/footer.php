@@ -84,5 +84,7 @@
 </footer>
 <script src="<?= $base ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="<?= $base ?>/assets/js/theme.js"></script>
+<script src="/projects/farmlink/assets/js/preloader.js"></script>
+<script src="/projects/farmlink/assets/js/counter.js"></script>
 </body>
 </html>

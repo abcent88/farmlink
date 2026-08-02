@@ -2,10 +2,9 @@
 
 require_once 'config/database.php';
 require_once 'includes/homepage-data.php';
-
-
 include 'includes/header.php';
 include 'includes/navbar.php';
+require_once 'includes/product_image.php';
 ?>
 
 
@@ -13,12 +12,15 @@ include 'includes/navbar.php';
 
 <div class="container text-center">
 
-<h3 class="display-3 fw-bold">
-Welcome to FarmLink
-</h3>
+<h1 class="display-2 fw-bold">
+
+Nigeria's Digital Agricultural Marketplace
+
+</h1>
 
 <p class="lead">
-Connecting Farmers, Buyers and Truckers Across Nigeria
+Connecting verified farmers, trusted buyers and reliable truckers
+on one secure marketplace.
 </p>
 
 <form method="GET" class="row g-3 justify-content-center mt-4">
@@ -30,7 +32,8 @@ Connecting Farmers, Buyers and Truckers Across Nigeria
             value="<?= htmlspecialchars($search) ?>"
             class="form-control form-control-lg"
             placeholder="Search products, categories or keywords...">
-    </div><div class="col-md-3">
+    </div>
+    <div class="col-md-3">
 
     <select
         name="category"
@@ -42,15 +45,15 @@ Connecting Farmers, Buyers and Truckers Across Nigeria
 
         <?php foreach ($categories as $cat): ?>
 
-            <option
-                value="<?= htmlspecialchars($cat) ?>"
-                <?= ($category === $cat) ? 'selected' : '' ?>>
+<option
+    value="<?= htmlspecialchars($cat['category']) ?>"
+    <?= ($category === $cat['category']) ? 'selected' : '' ?>>
 
-                <?= htmlspecialchars($cat) ?>
+    <?= htmlspecialchars($cat['category']) ?>
 
-            </option>
+</option>
 
-        <?php endforeach; ?>
+<?php endforeach; ?>
 
     </select>
 
@@ -58,7 +61,7 @@ Connecting Farmers, Buyers and Truckers Across Nigeria
 
     <div class="col-auto">
         <button type="submit" class="btn btn-success btn-lg">
-           🔍 Search
+           Search Products
         </button>
     </div>
 
@@ -69,14 +72,14 @@ Connecting Farmers, Buyers and Truckers Across Nigeria
     <a href="/projects/farmlink/register.php"
 class="btn btn-success btn-lg px-5">
 
-Join FarmLink
+Create Free Account
 
 </a>
 
 <a href="#products"
 class="btn btn-warning btn-lg px-5">
 
-Browse Products
+Explore Marketplace
 
 </a>
 </div>
@@ -94,13 +97,16 @@ Browse Categories
 
 <div class="row g-4">
 
-<?php foreach ($categories as $category): ?>
+<?php foreach ($categories as $cat):
 
-    <?php
+    $category = $cat['category'];
+?>
 
-    $image = "/projects/farmlink/assets/images/categories/default.jpg";
+<?php
 
-    switch (strtolower($category)) {
+$image = "/projects/farmlink/assets/images/categories/default.jpg";
+
+switch (strtolower($category)) {
 
         case 'grains':
             $image = "/projects/farmlink/assets/images/categories/grains.jpg";
@@ -150,8 +156,12 @@ Browse Categories
             <div class="card-body text-center">
 
                 <h5 class="fw-bold">
-                    <?= htmlspecialchars($category) ?>
-                </h5>
+    <?= htmlspecialchars($category) ?>
+</h5>
+
+<p class="text-muted mb-0">
+    <?= $cat['total'] ?> Products
+</p>
 
             </div>
 
@@ -171,27 +181,27 @@ Browse Categories
 <div class="row text-center g-3 mb-5">
 
     <div class="col-md-2">
-        <div class="card shadow">
+        <div class="card shadow stat-card border-0">
             <div class="card-body">
-                <h3><?= $farmerCount ?></h3>
+                <h3 class="counter" data-target="<?= $farmerCount ?>">0</h3>
                 <p>Farmers</p>
             </div>
         </div>
     </div>
 
     <div class="col-md-2">
-        <div class="card shadow">
+        <div class="card shadow stat-card border-0">
             <div class="card-body">
-                <h3><?= $buyerCount ?></h3>
+                <h3 class="counter" data-target="<?= $buyerCount ?>">0</h3>
                 <p>Buyers</p>
             </div>
         </div>
     </div>
 
     <div class="col-md-2">
-        <div class="card shadow">
+        <div class="card shadow stat-card border-0">
             <div class="card-body">
-                <h3><?= $truckerCount ?></h3>
+                <h3 class="counter" data-target="<?= $truckerCount ?>">0</h3>
                 <p>Truckers</p>
             </div>
         </div>
@@ -200,16 +210,16 @@ Browse Categories
     <div class="col-md-3">
         <div class="card shadow">
             <div class="card-body">
-                <h3><?= $productCount ?></h3>
+                <h3 class="counter" data-target="<?= $productCount ?>">0</h3>
                 <p>Approved Products</p>
             </div>
         </div>
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow">
+        <div class="card shadow stat-card border-0">
             <div class="card-body">
-                <h3><?= $deliveryCount ?></h3>
+                <h3 class="counter" data-target="<?= $deliveryCount ?>">0</h3>
                 <p>Completed Deliveries</p>
             </div>
         </div>
@@ -269,58 +279,9 @@ Browse Categories
 
         <?php foreach ($featuredProducts as $product): ?>
 
-        <div class="col-lg-3 col-md-6 mb-4">
+    
 
-            <div class="card featured-product-card h-100 shadow">
-
-                <?php if (!empty($product['image'])): ?>
-
-                    <img
-                        src="/projects/farmlink/uploads/products/<?= htmlspecialchars($product['image']) ?>"
-                        class="card-img-top"
-                        style="height:220px;object-fit:cover;"
-                        alt="<?= htmlspecialchars($product['product_name']) ?>">
-
-                <?php endif; ?>
-
-                <div class="card-body d-flex flex-column">
-
-                    <span class="badge bg-warning text-dark mb-2">
-                        Featured
-                    </span>
-
-                    <h5 class="fw-bold">
-                        <?= htmlspecialchars($product['product_name']) ?>
-                    </h5>
-
-                    <p class="mb-1">
-                        👨‍🌾 <?= htmlspecialchars($product['farmer_name']) ?>
-                    </p>
-
-                    <p class="mb-3">
-                        🌾 <?= htmlspecialchars($product['category']) ?>
-                    </p>
-
-                    <h4 class="text-success mb-4">
-                        ₦<?= number_format($product['price'],2) ?>
-                    </h4>
-
-                    <div class="mt-auto">
-
-                        <a href="/projects/farmlink/farmer/profile.php?id=<?= $product['farmer_id'] ?>"
-                           class="btn btn-success w-100">
-                            View Product
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <?php endforeach; ?>
+<?php endforeach; ?>
 
     </div>
 
@@ -523,75 +484,13 @@ Create Account
         </div>
 
     <?php else: ?>
+            <div class="row">
 
-        <div class="row">
+<?php foreach ($products as $product): ?>
 
-            <?php foreach ($products as $product): ?>
+    <?php include 'includes/product_card.php'; ?>
 
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-
-                    <div class="card product-card shadow h-100">
-                        <div class="position-absolute top-0 end-0 m-2">
-    <span class="badge bg-danger">
-        NEW
-    </span>
-</div>
-
-                        <?php if (!empty($product['image'])): ?>
-
-                            <img
-                                src="/projects/farmlink/uploads/products/<?= htmlspecialchars($product['image']) ?>"
-                                class="card-img-top"
-                                style="height:220px;object-fit:cover;"
-                                alt="<?= htmlspecialchars($product['product_name']) ?>">
-
-                        <?php endif; ?>
-
-                        <div class="card-body d-flex flex-column">
-
-    <h5 class="card-title">
-        <?= htmlspecialchars($product['product_name']) ?>
-    </h5>
-
-    <p class="mb-2">
-        <strong>Farmer:</strong>
-        <?= htmlspecialchars($product['farmer_name']) ?>
-    </p>
-
-    <p class="mb-2">
-        <?= htmlspecialchars($product['category']) ?>
-    </p>
-
-    <p class="mb-2">
-        <?= htmlspecialchars($product['quantity']) ?>
-        <?= htmlspecialchars($product['unit']) ?>
-    </p>
-
-    <h4 class="text-success fw-bold mb-4">
-        ₦<?= number_format($product['price'],2) ?>
-    </h4>
-
-    <div class="mt-auto d-grid gap-2">
-
-    <a href="/projects/farmlink/login.php"
-       class="btn btn-success">
-        View Details
-    </a>
-
-    <a href="/projects/farmlink/login.php"
-       class="btn btn-outline-success">
-        Contact Farmer
-    </a>
-
-</div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            <?php endforeach; ?>
+<?php endforeach; ?>
 
         </div>
 

@@ -283,39 +283,104 @@ section{
    HERO SECTION
 ===================================================== */
 
+
 .hero{
+
     position:relative;
-    min-height:650px;
+
+    min-height:90vh;
+
     display:flex;
+
     align-items:center;
+
     justify-content:center;
-    background:
-        linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
-        url("../images/hero/farm-bg.jpg") center center/cover no-repeat;
-    color:#fff;
+
     text-align:center;
+
+    color:#fff;
+
+    background:url("/projects/farmlink/assets/images/hero/farm-bg.jpg") center center/cover no-repeat;
+
 }
 
-.hero h1{
+.hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+}
+
+.hero .container{
+
+    position:relative;
+
+    z-index:2;
+
+}
+
+.hero h3{
+
     font-size:4rem;
-    font-weight:700;
+
+    font-weight:800;
+
+    margin-bottom:20px;
+
 }
 
 .hero p{
+
     font-size:1.3rem;
-    margin-top:15px;
+
     margin-bottom:35px;
+
 }
 
 .hero .form-control,
 .hero .form-select{
-    height:58px;
-    border-radius:12px;
+
+    border-radius:50px;
+
+    padding:15px 20px;
+
 }
 
 .hero .btn{
-    height:58px;
-    border-radius:12px;
+
+    border-radius:50px;
+
+    padding:14px 35px;
+
+    font-weight:600;
+
+}
+
+@media(max-width:768px){
+
+.hero{
+
+min-height:75vh;
+
+}
+
+.hero h3{
+
+font-size:2.3rem;
+
+}
+
+.hero p{
+
+font-size:1rem;
+
+}
+
 }
 
 /* =====================================================
@@ -1795,5 +1860,44 @@ testimonies
     .mobile-nav{
         display:none !important;
     }
+
+}
+/* ==========================
+   Statistics
+========================== */
+
+.stat-card{
+
+    border-radius:18px;
+
+    transition:.35s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+
+}
+
+.stat-card h3{
+
+    font-size:2.3rem;
+
+    color:#198754;
+
+    font-weight:700;
+
+}
+
+.stat-card p{
+
+    margin-bottom:0;
+
+    font-weight:600;
+
+    color:#666;
 
 }

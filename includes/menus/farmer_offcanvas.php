@@ -30,7 +30,7 @@
                 👤 My Profile
             </a>
 
-            <a href="/projects/farmlink/notifications.php"
+            <a href="/projects/farmlink/farmer/notifications.php"
                class="list-group-item list-group-item-action">
                 🔔 Notifications
             </a>

@@ -7,6 +7,22 @@ require_once '../includes/csrf.php';
 require_once '../includes/error_handler.php';
 
 requireRole('farmer');
+/*
+|--------------------------------------------------------------------------
+| Load Categories
+|--------------------------------------------------------------------------
+*/
+
+$categoryStmt = $pdo->query("
+SELECT
+    id,
+    category_name
+FROM product_categories
+WHERE status='active'
+ORDER BY category_name ASC
+");
+
+$categories = $categoryStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $message = '';
 
@@ -335,17 +351,35 @@ required>
 
 <div class="mb-3">
 
-<label>
+<label class="form-label">
 
 Category
 
 </label>
 
-<input
-type="text"
+<select
 name="category"
-class="form-control"
+class="form-select"
 required>
+
+<option value="">
+
+Select Category
+
+</option>
+
+<?php foreach($categories as $category): ?>
+
+<option
+value="<?= htmlspecialchars($category['category_name']) ?>">
+
+<?= htmlspecialchars($category['category_name']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
 </div>
 

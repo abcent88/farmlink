@@ -5,112 +5,167 @@ require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../includes/notify.php';
 
-
 requireRole('trucker');
 
-$id = (int)($_GET['id'] ?? 0);
+$deliveryId = (int)($_GET['id'] ?? 0);
+
+if ($deliveryId <= 0) {
+    die('Invalid delivery.');
+}
+
+/*
+|--------------------------------------------------------------------------
+| Load Delivery
+|--------------------------------------------------------------------------
+*/
 
 $stmt = $pdo->prepare("
-    SELECT order_id
-    FROM deliveries
-    WHERE id = ?
+SELECT
+
+    d.id,
+    d.status,
+    d.order_id,
+
+    o.buyer_id,
+    o.farmer_id,
+
+    p.product_name
+
+FROM deliveries d
+
+JOIN orders o
+    ON o.id = d.order_id
+
+JOIN products p
+    ON p.id = o.product_id
+
+WHERE
+    d.id = ?
+AND
+    d.trucker_id = ?
+
+LIMIT 1
 ");
 
-$stmt->execute([$id]);
+$stmt->execute([
+    $deliveryId,
+    $_SESSION['user_id']
+]);
 
 $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$delivery) {
-    appError(
-$e->getMessage()
-);
-
-appFail();
+    die('Delivery not found.');
 }
 
-$orderId = $delivery['order_id'];
-
-$stmt = $pdo->prepare("
-    SELECT
-        o.quantity AS ordered_qty,
-        o.product_id
-    FROM orders o
-    WHERE o.id = ?
-");
-
-$stmt->execute([$orderId]);
-
-$order = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$order) {
-    appError(
-$e->getMessage()
-);
-
-appFail('Order not found');
+if ($delivery['status'] !== 'accepted' && $delivery['status'] !== 'in_transit') {
+    die('This delivery cannot be completed.');
 }
 
-/*
-|--------------------------------------------------------------------------
-| Complete Delivery
-|--------------------------------------------------------------------------
-*/
+try {
 
-$stmt = $pdo->prepare("
-    UPDATE deliveries
-    SET status = 'completed'
-    WHERE id = ?
-");
-notify(
+    $pdo->beginTransaction();
 
-$pdo,
+    /*
+    |--------------------------------------------------------------------------
+    | Complete Delivery
+    |--------------------------------------------------------------------------
+    */
 
-$buyerId,
+    $stmt = $pdo->prepare("
+        UPDATE deliveries
+        SET status='completed'
+        WHERE id=?
+    ");
 
-'Order Completed',
+    $stmt->execute([$deliveryId]);
 
-'Your order was completed successfully.'
+    /*
+    |--------------------------------------------------------------------------
+    | Complete Order
+    |--------------------------------------------------------------------------
+    */
 
-);
+    $stmt = $pdo->prepare("
+        UPDATE orders
+        SET status='completed'
+        WHERE id=?
+    ");
 
-$stmt->execute([$id]);
+    $stmt->execute([
+        $delivery['order_id']
+    ]);
+    $stmt->execute([$orderId]);
 
-/*
-|--------------------------------------------------------------------------
-| Complete Order
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | Notify Buyer
+    |--------------------------------------------------------------------------
+    */
 
-$stmt = $pdo->prepare("
-    UPDATE orders
-    SET status = 'completed'
-    WHERE id = ?
-");
+    notify(
 
-$stmt->execute([$orderId]);
+        $pdo,
 
-/*
-|--------------------------------------------------------------------------
-| Reduce Product Stock
-|--------------------------------------------------------------------------
-*/
+        $delivery['buyer_id'],
 
-$stmt = $pdo->prepare("
-    UPDATE products
-    SET
-        quantity = GREATEST(0, quantity - ?),
-        status = CASE
-            WHEN quantity - ? <= 0 THEN 'rejected'
-            ELSE status
-        END
-    WHERE id = ?
-");
+        'Order Delivered',
 
-$stmt->execute([
-    $order['ordered_qty'],
-    $order['ordered_qty'],
-    $order['product_id']
-]);
-header("Location: my_deliveries.php");
-exit;
-?>
+        'Your order for "' .
+        $delivery['product_name'] .
+        '" has been delivered successfully.'
+
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notify Farmer
+    |--------------------------------------------------------------------------
+    */
+
+    notify(
+
+        $pdo,
+
+        $delivery['farmer_id'],
+
+        'Delivery Completed',
+
+        'Delivery of "' .
+        $delivery['product_name'] .
+        '" has been completed successfully.'
+
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notify Trucker
+    |--------------------------------------------------------------------------
+    */
+
+    notify(
+
+        $pdo,
+
+        $_SESSION['user_id'],
+
+        'Delivery Completed',
+
+        'You have successfully completed the delivery of "' .
+        $delivery['product_name'] .
+        '".'
+
+    );
+
+    $pdo->commit();
+
+    header("Location: my_deliveries.php?completed=1");
+    exit;
+
+} catch (Exception $e) {
+
+    $pdo->rollBack();
+
+    die($e->getMessage());
+
+}

@@ -6,59 +6,55 @@ require_once '../../config/database.php';
 
 requireRole('lga_admin');
 
-$adminId=$_SESSION['user_id'];
+$adminId = $_SESSION['user_id'];
 
 /*
 |--------------------------------------------------------------------------
-| Admin Location
+| Admin Information
 |--------------------------------------------------------------------------
 */
 
-$stmt=$pdo->prepare("
-SELECT lga,town
+$stmt = $pdo->prepare("
+SELECT lga, town
 FROM users
 WHERE id=?
 ");
 
 $stmt->execute([$adminId]);
 
-$admin=$stmt->fetch(PDO::FETCH_ASSOC);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$lga=$admin['lga']??'';
-$town=$admin['town']??'';
+$lga = $admin['lga'] ?? '';
 
 /*
 |--------------------------------------------------------------------------
-| Stats
+| Dashboard Statistics
 |--------------------------------------------------------------------------
 */
 
-$farmers=$pdo->prepare("
+// Farmers
+$stmt = $pdo->prepare("
 SELECT COUNT(*)
 FROM users
 WHERE role='farmer'
 AND lga=?
 ");
+$stmt->execute([$lga]);
+$totalFarmers = $stmt->fetchColumn();
 
-$farmers->execute([$lga]);
-
-$totalFarmers=
-$farmers->fetchColumn();
-
-$products=$pdo->prepare("
+// Products
+$stmt = $pdo->prepare("
 SELECT COUNT(*)
 FROM products p
 JOIN users u
 ON p.farmer_id=u.id
 WHERE u.lga=?
 ");
+$stmt->execute([$lga]);
+$totalProducts = $stmt->fetchColumn();
 
-$products->execute([$lga]);
-
-$totalProducts=
-$products->fetchColumn();
-
-$orders=$pdo->prepare("
+// Orders
+$stmt = $pdo->prepare("
 SELECT COUNT(*)
 FROM orders o
 JOIN products p
@@ -66,34 +62,57 @@ ON o.product_id=p.id
 JOIN users u
 ON p.farmer_id=u.id
 WHERE u.lga=?
-AND o.status
-IN(
-'accepted',
-'completed'
-)
 ");
+$stmt->execute([$lga]);
+$totalOrders = $stmt->fetchColumn();
 
-$orders->execute([$lga]);
-
-$totalOrders=
-$orders->fetchColumn();
-
-$commission=
-$pdo->prepare("
-SELECT SUM(amount)
+// Commission
+$stmt = $pdo->prepare("
+SELECT COALESCE(SUM(amount),0)
 FROM admin_commissions
 WHERE admin_id=?
 ");
+$stmt->execute([$adminId]);
+$totalCommission = $stmt->fetchColumn();
 
-$commission->execute([
-$adminId
-]);
+/*
+|--------------------------------------------------------------------------
+| Verification Statistics
+|--------------------------------------------------------------------------
+*/
 
-$totalCommission=
-$commission->fetchColumn();
+$stmt = $pdo->prepare("
+SELECT COUNT(*)
+FROM farmer_profiles fp
+JOIN users u
+ON fp.user_id=u.id
+WHERE fp.verification_status='pending'
+AND u.lga=?
+");
+$stmt->execute([$lga]);
+$pendingVerification = $stmt->fetchColumn();
 
-$totalCommission=
-$totalCommission?:0;
+$stmt = $pdo->prepare("
+SELECT COUNT(*)
+FROM farmer_profiles fp
+JOIN users u
+ON fp.user_id=u.id
+WHERE fp.verification_status='verified'
+AND u.lga=?
+");
+$stmt->execute([$lga]);
+$verifiedFarmers = $stmt->fetchColumn();
+
+$stmt = $pdo->prepare("
+SELECT COUNT(*)
+FROM farmer_profiles fp
+JOIN users u
+ON fp.user_id=u.id
+WHERE fp.verification_status='rejected'
+AND u.lga=?
+");
+$stmt->execute([$lga]);
+$rejectedFarmers = $stmt->fetchColumn();
 
 /*
 |--------------------------------------------------------------------------
@@ -101,8 +120,7 @@ $totalCommission?:0;
 |--------------------------------------------------------------------------
 */
 
-$recent=
-$pdo->prepare("
+$stmt = $pdo->prepare("
 SELECT
 o.id,
 o.quantity,
@@ -118,97 +136,53 @@ ORDER BY o.id DESC
 LIMIT 5
 ");
 
-$recent->execute([
-$lga
-]);
+$stmt->execute([$lga]);
 
-$recentOrders=
-$recent->fetchAll();
+$recentOrders = $stmt->fetchAll();
+
+/*
+|--------------------------------------------------------------------------
+| Recent Pending Verifications
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+SELECT
+u.id,
+u.fullname,
+u.phone,
+u.town,
+fp.farm_name
+FROM farmer_profiles fp
+JOIN users u
+ON fp.user_id=u.id
+WHERE fp.verification_status='pending'
+AND u.lga=?
+ORDER BY fp.id DESC
+LIMIT 5
+");
+
+$stmt->execute([$lga]);
+
+$pendingFarmers = $stmt->fetchAll();
 
 include '../../includes/header.php';
 include '../../includes/navbar.php';
-
 ?>
 
-<style>
+<div class="container py-4">
 
-.quick-grid{
+<h2 class="mb-3">
 
-display:grid;
-
-grid-template-columns:
-repeat(
-auto-fit,
-minmax(
-150px,
-1fr
-));
-
-gap:15px;
-
-}
-
-.quick-card{
-
-padding:20px;
-
-border-radius:20px;
-
-text-align:center;
-
-background:
-var(--nav-card);
-
-box-shadow:
-0 3px 12px
-rgba(
-0,
-0,
-0,
-0.12
-);
-
-text-decoration:none;
-
-color:
-var(--nav-text);
-
-}
-
-.quick-card:hover{
-
-transform:
-translateY(-4px);
-
-}
-
-.quick-card span{
-
-font-size:34px;
-
-display:block;
-
-margin-bottom:10px;
-
-}
-
-</style>
-
-<div class="container mt-4">
-
-<h2>
-
-🗺️ LGA Dashboard
+LGA Admin Dashboard
 
 </h2>
 
 <p>
 
-Welcome
+Welcome,
 
-<?= htmlspecialchars(
-$_SESSION['fullname']
-) ?>
+<strong><?= htmlspecialchars($_SESSION['fullname']) ?></strong>
 
 </p>
 
@@ -216,39 +190,25 @@ $_SESSION['fullname']
 
 LGA:
 
-<b>
-
-<?= htmlspecialchars(
-$lga
-) ?>
-
-</b>
+<strong><?= htmlspecialchars($lga) ?></strong>
 
 </p>
 
-<div class="row text-center mb-4">
+<div class="row g-3 mb-4">
 
 <div class="col-md-3">
 
-<div class="card shadow p-3">
+<div class="card shadow text-center">
 
-<h2>
+<div class="card-body">
 
-👨‍🌾
+<h1>👨‍🌾</h1>
 
-</h2>
+<h3><?= $totalFarmers ?></h3>
 
-<h3>
+<p>Total Farmers</p>
 
-<?= $totalFarmers ?>
-
-</h3>
-
-<p>
-
-Farmers
-
-</p>
+</div>
 
 </div>
 
@@ -256,25 +216,17 @@ Farmers
 
 <div class="col-md-3">
 
-<div class="card shadow p-3">
+<div class="card shadow text-center">
 
-<h2>
+<div class="card-body">
 
-🌾
+<h1>🌾</h1>
 
-</h2>
+<h3><?= $totalProducts ?></h3>
 
-<h3>
+<p>Products</p>
 
-<?= $totalProducts ?>
-
-</h3>
-
-<p>
-
-Products
-
-</p>
+</div>
 
 </div>
 
@@ -282,25 +234,17 @@ Products
 
 <div class="col-md-3">
 
-<div class="card shadow p-3">
+<div class="card shadow text-center">
 
-<h2>
+<div class="card-body">
 
-📦
+<h1>📦</h1>
 
-</h2>
+<h3><?= $totalOrders ?></h3>
 
-<h3>
+<p>Orders</p>
 
-<?= $totalOrders ?>
-
-</h3>
-
-<p>
-
-Orders
-
-</p>
+</div>
 
 </div>
 
@@ -308,29 +252,50 @@ Orders
 
 <div class="col-md-3">
 
-<div
-class="card shadow p-3 bg-success text-white">
+<div class="card bg-success text-white shadow text-center">
 
-<h2>
+<div class="card-body">
 
-💰
+<h1>💰</h1>
 
-</h2>
+<h4>₦<?= number_format($totalCommission,2) ?></h4>
 
-<h4>
+<p>Commission</p>
 
-₦<?= number_format(
-$totalCommission,
-2
-) ?>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<hr>
+
+<h4 class="mb-3">
+
+Farmer Verification
 
 </h4>
 
-<p>
+<div class="row g-3 mb-4">
 
-Commission
+<div class="col-md-4">
 
-</p>
+<div class="card bg-warning shadow text-center">
+
+<div class="card-body">
+
+<h2><?= $pendingVerification ?></h2>
+
+<p>Pending Verification</p>
+
+<a href="farmer_verifications.php"
+class="btn btn-dark btn-sm">
+
+Review
+
+</a>
 
 </div>
 
@@ -338,51 +303,95 @@ Commission
 
 </div>
 
-<h4>
+<div class="col-md-4">
+
+<div class="card bg-success text-white shadow text-center">
+
+<div class="card-body">
+
+<h2><?= $verifiedFarmers ?></h2>
+
+<p>Verified Farmers</p>
+
+<a href="verified_farmers.php"
+class="btn btn-light btn-sm">
+
+View
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card bg-danger text-white shadow text-center">
+
+<div class="card-body">
+
+<h2><?= $rejectedFarmers ?></h2>
+
+<p>Rejected Farmers</p>
+
+<a href="rejected_farmers.php"
+class="btn btn-light btn-sm">
+
+View
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<hr>
+
+<h4 class="mb-3">
 
 Quick Actions
 
 </h4>
 
-<div class="quick-grid mb-5">
+<div class="d-flex flex-wrap gap-2 mb-5">
 
-<a
-class="quick-card"
-href="orders.php">
+<a href="farmer_verifications.php" class="btn btn-warning">
 
-<span>
-
-📦
-
-</span>
-
-Review Orders
+Pending Verification
 
 </a>
 
-<a
-class="quick-card"
-href="commissions.php">
+<a href="verified_farmers.php" class="btn btn-success">
 
-<span>
+Verified Farmers
 
-💵
+</a>
 
-</span>
+<a href="rejected_farmers.php" class="btn btn-danger">
+
+Rejected Farmers
+
+</a>
+
+<a href="orders.php" class="btn btn-primary">
+
+Orders
+
+</a>
+
+<a href="commissions.php" class="btn btn-info">
 
 Commissions
 
 </a>
 
-<a
-class="quick-card"
-href="../users.php">
-
-<span>
-
-👥
-
-</span>
+<a href="../users.php" class="btn btn-secondary">
 
 Users
 
@@ -390,16 +399,97 @@ Users
 
 </div>
 
-<div class="card shadow p-3">
+<div class="row">
 
-<h4>
+<div class="col-lg-6">
+
+<div class="card shadow mb-4">
+
+<div class="card-header">
+
+Recent Pending Verification
+
+</div>
+
+<div class="card-body">
+
+<?php if(empty($pendingFarmers)): ?>
+
+<div class="alert alert-success mb-0">
+
+No pending verification requests.
+
+</div>
+
+<?php else: ?>
+
+<table class="table table-sm">
+
+<thead>
+
+<tr>
+
+<th>Farmer</th>
+
+<th>Farm</th>
+
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<?php foreach($pendingFarmers as $farmer): ?>
+
+<tr>
+
+<td><?= htmlspecialchars($farmer['fullname']) ?></td>
+
+<td><?= htmlspecialchars($farmer['farm_name']) ?></td>
+
+<td>
+
+<a
+href="review_farmer.php?id=<?= $farmer['id'] ?>"
+class="btn btn-warning btn-sm">
+
+Review
+
+</a>
+
+</td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</tbody>
+
+</table>
+
+<?php endif; ?>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-6">
+
+<div class="card shadow">
+
+<div class="card-header">
 
 Recent Orders
 
-</h4>
+</div>
 
-<table
-class="table">
+<div class="card-body">
+
+<table class="table table-sm">
 
 <thead>
 
@@ -419,42 +509,21 @@ class="table">
 
 <tbody>
 
-<?php foreach(
-$recentOrders
-as
-$order
-): ?>
+<?php foreach($recentOrders as $order): ?>
 
 <tr>
 
-<td>
+<td><?= $order['id'] ?></td>
 
-<?= $order['id'] ?>
+<td><?= htmlspecialchars($order['product_name']) ?></td>
 
-</td>
-
-<td>
-
-<?= htmlspecialchars(
-$order['product_name']
-) ?>
-
-</td>
+<td><?= $order['quantity'] ?></td>
 
 <td>
 
-<?= $order['quantity'] ?>
+<span class="badge bg-secondary">
 
-</td>
-
-<td>
-
-<span
-class="badge bg-secondary">
-
-<?= ucfirst(
-$order['status']
-) ?>
+<?= ucfirst($order['status']) ?>
 
 </span>
 
@@ -467,6 +536,12 @@ $order['status']
 </tbody>
 
 </table>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 

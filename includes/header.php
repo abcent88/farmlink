@@ -24,7 +24,43 @@ $base = "/projects/farmlink";
 <link rel="stylesheet" href="<?= $base ?>/assets/css/style.css">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/theme.css">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/navbar.css">
+<link rel="stylesheet" href="/projects/farmlink/assets/css/preloader.css">
 
 </head>
 
 <body>
+    <div id="preloader">
+
+    <div class="preloader-box">
+
+        <img
+    src="/projects/farmlink/assets/images/logo/farmlink-logo.png"
+    alt="FarmLink"
+    class="preloader-logo">
+
+            FarmLink
+
+        </div>
+
+        <div class="preloader-sub">
+
+            Connecting Farmers, Buyers & Truckers
+
+        </div>
+
+        <div class="loader-dots">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </div>
+        <div class="loader-progress">
+
+    <div class="loader-progress-bar"></div>
+
+</div>
+
+    </div>
+
+</div>
