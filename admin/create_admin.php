@@ -3,6 +3,7 @@ require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
 require_once '../includes/csrf.php';
+require_once '../includes/lgas.php';
 
 requireRole('super_admin');
 
@@ -99,10 +100,23 @@ require_once '../includes/csrf.php';
             <input type="password" name="password" class="form-control" required>
         </div>
 
-        <div class="mb-3">
-            <label>LGA</label>
-            <input type="text" name="lga" class="form-control" required>
-        </div>
+        <select name="lga" class="form-control" required>
+
+<option value="">Select LGA</option>
+
+<?php foreach ($lgas as $row): ?>
+
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
+
+    <?= htmlspecialchars($row['lga']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
         <div class="mb-3">
             <label>Town</label>

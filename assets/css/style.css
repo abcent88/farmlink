@@ -1497,45 +1497,63 @@ textarea.form-control{
 
 }
 
-/* Footer */
+/* ==========================
+   COMPACT FOOTER
+========================== */
 
 .footer{
+
     background:#198754;
+
     color:#fff;
+
     width:100%;
-    margin-top:auto;
-}
 
-.footer-link{
-    color:#d1d5db;
-    text-decoration:none;
-    display:block;
-    margin-bottom:10px;
-    transition:.3s;
-}
+    padding:12px 0;
 
-.footer-link:hover{
-    color:#22c55e;
-    padding-left:6px;
+    margin-top:30px;
+
+    font-size:.95rem;
+
 }
 
 .footer h5{
+
+    margin-bottom:8px;
+
+    font-weight:700;
+
+}
+
+.footer a{
+
     color:#fff;
-    margin-bottom:20px;
+
+    text-decoration:none;
+
+    margin:0 8px;
+
 }
 
-.footer p{
-    color:#d1d5db;
+.footer a:hover{
+
+    text-decoration:underline;
+
 }
 
-.footer input{
-    border-radius:10px;
+.footer .small{
+
+    opacity:.9;
+
+    font-size:.85rem;
+
 }
 
-.footer button{
-    border-radius:10px;
-}
+[data-theme="dark"] .footer{
 
+    background:#14532d;
+
+}
 /* ==========================
    LOADING ANIMATION
 ========================== */
@@ -1900,4 +1918,27 @@ testimonies
 
     color:#666;
 
+}
+
+.rating{
+display:flex;
+flex-direction:row-reverse;
+justify-content:flex-end;
+font-size:2rem;
+}
+
+.rating input{
+display:none;
+}
+
+.rating label{
+cursor:pointer;
+color:#ccc;
+transition:.2s;
+}
+
+.rating input:checked ~ label,
+.rating label:hover,
+.rating label:hover ~ label{
+color:#ffc107;
 }

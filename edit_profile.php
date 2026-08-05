@@ -2,6 +2,7 @@
 
 require_once 'config/database.php';
 require_once 'includes/auth.php';
+require_once 'includes/lgas.php';
 
 $userId = $_SESSION['user_id'];
 
@@ -152,22 +153,23 @@ Edit Profile
 
         </div>
 
-        <div class="col-md-6 mb-3">
+        <<select name="lga" class="form-control" required>
 
-            <label class="form-label">
+<option value="">Select LGA</option>
 
-                LGA
+<?php foreach ($lgas as $row): ?>
 
-            </label>
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
 
-            <input
-                type="text"
-                name="lga"
-                class="form-control"
-                value="<?= htmlspecialchars($user['lga']) ?>">
+    <?= htmlspecialchars($row['lga']) ?>
 
-        </div>
+</option>
 
+<?php endforeach; ?>
+
+</select>
         <div class="col-md-6 mb-3">
 
             <label class="form-label">

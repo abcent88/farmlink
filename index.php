@@ -87,6 +87,7 @@ Explore Marketplace
 </div>
 
 </section>
+</div>
 <section class="container py-5">
 
 <h2 class="text-center mb-4">
@@ -275,17 +276,23 @@ switch (strtolower($category)) {
 
     <?php if (!empty($featuredProducts)): ?>
 
-    <div class="row">
+<div class="row g-4">
 
-        <?php foreach ($featuredProducts as $product): ?>
+<?php foreach ($featuredProducts as $product): ?>
 
-    
+    <?php include 'includes/product_card.php'; ?>
 
 <?php endforeach; ?>
 
-    </div>
+</div>
 
-    <?php endif; ?>
+<?php else: ?>
+
+<div class="alert alert-info text-center">
+    Featured products will appear here.
+</div>
+
+<?php endif; ?>
 
 </section>
 <section class="container py-5">
@@ -357,91 +364,66 @@ Safe transactions for everyone.
 </section>
 <section class="container py-5">
 
-    <div class="text-center mb-5">
-        <h2 class="fw-bold">What Our Buyers Say</h2>
-        <p class="text-muted">
-            Hear from customers who buy agricultural products through FarmLink.
-        </p>
-    </div>
+<h2 class="text-center mb-5">
+What Our Clients Say
+</h2>
 
-    <div class="row">
+<div class="row g-4">
 
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow border-0 h-100">
-                <div class="card-body">
-                    <div class="mb-3 text-warning fs-5">
-                        ★★★★★
-                    </div>
+<?php if (!empty($testimonials)): ?>
 
-                    <p class="fst-italic">
-                        "FarmLink helped me source quality maize directly from trusted farmers at a fair price."
-                    </p>
+<div class="row g-4">
 
-                    <hr>
+<?php foreach ($testimonials as $testimonial): ?>
 
-                    <h6 class="mb-0 fw-bold">
-                        James Adebayo
-                    </h6>
+<div class="col-md-4">
 
-                    <small class="text-muted">
-                        Food Processor • Lagos
-                    </small>
+<div class="card h-100 shadow-sm">
 
-                </div>
-            </div>
-        </div>
+<div class="card-body">
 
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow border-0 h-100">
-                <div class="card-body">
-                    <div class="mb-3 text-warning fs-5">
-                        ★★★★★
-                    </div>
+<div class="mb-2">
 
-                    <p class="fst-italic">
-                        "Ordering vegetables has become much easier. Delivery was fast and reliable."
-                    </p>
+<?php
+for ($i = 1; $i <= 5; $i++) {
+    echo $i <= $testimonial['rating'] ? '⭐' : '☆';
+}
+?>
 
-                    <hr>
+</div>
 
-                    <h6 class="mb-0 fw-bold">
-                        Sarah Okon
-                    </h6>
+<p class="mb-3">
 
-                    <small class="text-muted">
-                        Restaurant Owner • Uyo
-                    </small>
+<?= nl2br(htmlspecialchars($testimonial['message'])) ?>
 
-                </div>
-            </div>
-        </div>
+</p>
 
-        <div class="col-lg-4 mb-4">
-           <div class="card testimonial-card shadow h-100">
-                <div class="card-body">
-                    <div class="mb-3 text-warning fs-5">
-                        ★★★★★
-                    </div>
+<h6 class="text-success mb-0">
 
-                    <p class="fst-italic">
-                        "The platform connects us directly with verified farmers. It has improved our purchasing process."
-                    </p>
+<?= htmlspecialchars($testimonial['fullname']) ?>
 
-                    <hr>
+</h6>
 
-                    <h6 class="mb-0 fw-bold">
-                        Ibrahim Musa
-                    </h6>
+</div>
 
-                    <small class="text-muted">
-                        Grain Merchant • Kano
-                    </small>
+</div>
 
-                </div>
-            </div>
-        </div>
+</div>
 
-    </div>
+<?php endforeach; ?>
+
+</div>
+
+<?php else: ?>
+
+<div class="alert alert-info text-center">
+
+No testimonials yet.
+
+</div>
+
+<?php endif; ?>
+</div>
 
 </section>
 <section class="bg-success text-white py-5">

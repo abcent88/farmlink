@@ -3,6 +3,7 @@
 require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
+require_once '../includes/lgas.php';
 
 requireRole('buyer');
 
@@ -128,16 +129,23 @@ include '../includes/navbar.php';
 
                 </div>
 
-                <div class="col-md-3">
+                <select name="lga" class="form-control" required>
 
-                    <input
-                        type="text"
-                        name="lga"
-                        class="form-control"
-                        placeholder="LGA"
-                        value="<?= htmlspecialchars($lga) ?>">
+<option value="">Select LGA</option>
 
-                </div>
+<?php foreach ($lgas as $row): ?>
+
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
+
+    <?= htmlspecialchars($row['lga']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
                 <div class="col-md-2 d-grid">
 
@@ -207,13 +215,23 @@ include '../includes/navbar.php';
 
                         </p>
 
-                        <p class="mb-1">
+                        <select name="lga" class="form-control" required>
 
-                            <strong>LGA:</strong>
+<option value="">Select LGA</option>
 
-                            <?= htmlspecialchars($product['lga']) ?>
+<?php foreach ($lgas as $row): ?>
 
-                        </p>
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
+
+    <?= htmlspecialchars($row['lga']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
                         <p class="mb-1">
 

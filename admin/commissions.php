@@ -3,6 +3,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../config/database.php';
+require_once '../includes/lgas.php';
 
 requireRole('super_admin');
 
@@ -119,9 +120,23 @@ Filter
 <?= htmlspecialchars($admin['fullname']) ?>
 </td>
 
-<td>
-<?= htmlspecialchars($admin['lga']) ?>
-</td>
+<select name="lga" class="form-control" required>
+
+<option value="">Select LGA</option>
+
+<?php foreach ($lgas as $row): ?>
+
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
+
+    <?= htmlspecialchars($row['lga']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
 <td>
 <?= htmlspecialchars($admin['town']) ?>

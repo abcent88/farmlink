@@ -4,6 +4,7 @@ require_once '../../includes/auth.php';
 require_once '../../includes/roles.php';
 require_once '../../config/database.php';
 require_once '../../includes/csrf.php';
+require_once '../includes/lgas.php';
 requireRole('super_admin');
 
 $message = '';
@@ -144,15 +145,23 @@ include '../../includes/navbar.php';
                     required>
             </div>
 
-            <div class="mb-3">
-                <label>LGA</label>
-                <input
-                    type="text"
-                    name="lga"
-                    class="form-control"
-                    placeholder="e.g. Makurdi"
-                    required>
-            </div>
+            <select name="lga" class="form-control" required>
+
+<option value="">Select LGA</option>
+
+<?php foreach ($lgas as $row): ?>
+
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
+
+    <?= htmlspecialchars($row['lga']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
             <div class="mb-3">
                 <label>Town</label>

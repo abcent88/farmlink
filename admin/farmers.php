@@ -4,6 +4,7 @@ require_once '../config/database.php';
 require_once '../includes/auth.php';
 require_once '../includes/roles.php';
 require_once '../includes/csrf.php';
+require_once '../includes/lgas.php';
 
 requireRole(['super_admin', 'lga_admin']);
 
@@ -475,14 +476,29 @@ include '../includes/navbar.php';
 
                 <div class="col-lg-2">
 
-                    <input
-                        type="text"
-                        name="lga"
-                        class="form-control"
-                        placeholder="LGA"
-                        value="<?= htmlspecialchars($lga) ?>">
+    <select
+        name="lga"
+        class="form-select">
 
-                </div>
+        <option value="">
+            All LGAs
+        </option>
+
+        <?php foreach ($lgas as $row): ?>
+
+            <option
+                value="<?= htmlspecialchars($row['lga']) ?>"
+                <?= ($lga === $row['lga']) ? 'selected' : '' ?>>
+
+                <?= htmlspecialchars($row['lga']) ?>
+
+            </option>
+
+        <?php endforeach; ?>
+
+    </select>
+
+</div>
 
                 <?php endif; ?>
 
@@ -835,10 +851,23 @@ alt="<?= htmlspecialchars($farmer['fullname']) ?>">
 <?= htmlspecialchars($farmer['phone']) ?>
 </div>
 
-<div class="col-md-6 mb-3">
-<strong>LGA</strong><br>
-<?= htmlspecialchars($farmer['lga']) ?>
-</div>
+<select name="lga" class="form-control" required>
+
+<option value="">Select LGA</option>
+
+<?php foreach ($lgas as $row): ?>
+
+<option
+    value="<?= htmlspecialchars($row['lga']) ?>"
+    <?= (($currentLga ?? '') == $row['lga']) ? 'selected' : '' ?>>
+
+    <?= htmlspecialchars($row['lga']) ?>
+
+</option>
+
+<?php endforeach; ?>
+
+</select>
 
 <div class="col-md-6 mb-3">
 <strong>Town</strong><br>

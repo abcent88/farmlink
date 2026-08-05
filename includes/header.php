@@ -38,13 +38,10 @@ $base = "/projects/farmlink";
     alt="FarmLink"
     class="preloader-logo">
 
-            FarmLink
 
         </div>
 
         <div class="preloader-sub">
-
-            Connecting Farmers, Buyers & Truckers
 
         </div>
 

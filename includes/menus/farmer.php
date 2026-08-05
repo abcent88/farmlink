@@ -41,6 +41,13 @@
 </li>
 
 <li class="nav-item">
+    <a class="nav-link" href="/projects/farmlink/testimonial.php">
+        <i class="bi bi-star-fill me-1"></i>
+        Share Experience
+    </a>
+</li>
+
+<li class="nav-item">
     <a class="nav-link" href="/projects/farmlink/logout.php">
         <i class="bi bi-box-arrow-right me-1"></i>
         Logout

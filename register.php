@@ -3,6 +3,7 @@
 require_once 'config/database.php';
 require_once 'includes/validation.php';
 require_once 'includes/csrf.php';
+require_once 'includes/lgas.php';
 
 $message = '';
 $errors = [];
@@ -18,6 +19,8 @@ $role = trim($_POST['role']);
 $lga = trim($_POST['lga']);
 $town = trim($_POST['town']);
 $password = $_POST['password'];
+$confirmPassword = $_POST['confirm_password'] ?? '';
+
 if ($password !== $confirmPassword) {
     $errors[] = "Passwords do not match.";
 }
@@ -175,7 +178,7 @@ include 'includes/navbar.php';
 
 <div class="alert alert-info">
 
-<?= $message ?>
+<?= htmlspecialchars($message) ?>
 
 </div>
 
@@ -200,6 +203,7 @@ required>
 type="email"
 name="email"
 class="form-control"
+value="<?= htmlspecialchars($email ?? '') ?>"
 required>
 
 <br>
@@ -210,6 +214,7 @@ required>
 type="text"
 name="phone"
 class="form-control"
+value="<?= htmlspecialchars($phone ?? '') ?>"
 required>
 
 <br>
@@ -225,15 +230,21 @@ required>
 Select Role
 </option>
 
-<option value="farmer">
+<option
+value="farmer"
+<?= (($role ?? '') === 'farmer') ? 'selected' : '' ?>>
 Farmer
 </option>
 
-<option value="buyer">
+<option
+value="buyer"
+<?= (($role ?? '') === 'buyer') ? 'selected' : '' ?>>
 Buyer
 </option>
 
-<option value="trucker">
+<option
+value="trucker"
+<?= (($role ?? '') === 'trucker') ? 'selected' : '' ?>>
 Trucker
 </option>
 
@@ -311,37 +322,36 @@ id="toggleConfirmPassword">
 
 <label>LGA</label>
 
+<label>LGA</label>
+
 <select
-name="lga"
-class="form-control"
-required>
+    name="lga"
+    class="form-control"
+    required>
 
-<option value="">
-Select LGA
-</option>
+    <option value="">Select LGA</option>
 
-<option value="Makurdi">
-Makurdi
-</option>
+    <?php
+    $stmt = $pdo->query("
+        SELECT lga
+        FROM lgas
+        ORDER BY lga
+    ");
 
-<option value="Tarka">
-Tarka
-</option>
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
+    ?>
 
-<option value="Gboko">
-Gboko
-</option>
+        <option
+            value="<?= htmlspecialchars($row['lga']) ?>"
+            <?= (($lga ?? '') === $row['lga']) ? 'selected' : '' ?>>
 
-<option value="Guma">
-Guma
-</option>
+            <?= htmlspecialchars($row['lga']) ?>
 
-<option value="Buruku">
-Buruku
-</option>
+        </option>
+
+    <?php endwhile; ?>
 
 </select>
-
 <br>
 
 <label>Town</label>
@@ -350,6 +360,7 @@ Buruku
 type="text"
 name="town"
 class="form-control"
+value="<?= htmlspecialchars($town ?? '') ?>"
 required>
 
 <br>

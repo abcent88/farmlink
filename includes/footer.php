@@ -1,90 +1,63 @@
-<footer class="footer bg-dark text-light mt-5">
+<?php
+require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/settings.php';
+?>
+<footer class="footer">
 
-    <div class="container py-5">
+<div class="container text-center">
 
-        <div class="row">
+<h5 class="mb-2">
+🌱 <?= htmlspecialchars($settings['site_name']) ?>
+</h5>
 
-            <div class="col-lg-4 mb-4">
+<div class="mb-2">
 
-                <h4 class="text-success">
-                    🌾 FarmLink
-                </h4>
+<a href="/projects/farmlink/">Home</a>
 
-                <p>
-                    Connecting farmers, buyers and truckers across Nigeria through a secure agricultural marketplace.
-                </p>
+|
 
-            </div>
+<a href="/projects/farmlink/index.php#products">Marketplace</a>
 
-            <div class="col-lg-2 col-md-6 mb-4">
+|
 
-                <h5>Quick Links</h5>
+<a href="/projects/farmlink/register.php">Register</a>
 
-                <ul class="list-unstyled">
+|
 
-                    <li><a href="/projects/farmlink/" class="footer-link">Home</a></li>
-                    <li><a href="#products" class="footer-link">Products</a></li>
-                    <li><a href="/projects/farmlink/register.php" class="footer-link">Register</a></li>
-                    <li><a href="/projects/farmlink/login.php" class="footer-link">Login</a></li>
+<a href="/projects/farmlink/login.php">Login</a>
 
-                </ul>
+</div>
 
-            </div>
+<div class="mb-2">
 
-            <div class="col-lg-3 col-md-6 mb-4">
+<?= htmlspecialchars($settings['contact_email']) ?>
 
-                <h5>Contact</h5>
+|
 
-                <p>📧 support@farmlink.ng</p>
+<?= htmlspecialchars($settings['contact_phone']) ?>
 
-                <p>📞 +234 XXX XXX XXXX</p>
+</div>
 
-                <p>📍 Nigeria</p>
+<div class="small">
 
-            </div>
+© <?= date('Y') ?>
 
-            <div class="col-lg-3">
+<?= htmlspecialchars($settings['site_name']) ?>
 
-                <h5>Stay Updated</h5>
+•
 
-                <p>
-                    Subscribe for agricultural news and marketplace updates.
-                </p>
+<?= htmlspecialchars($settings['footer_text']) ?>
 
-                <form>
+</div>
 
-                    <input
-                        type="email"
-                        class="form-control mb-2"
-                        placeholder="Email address">
-
-                    <button
-                        class="btn btn-success w-100">
-
-                        Subscribe
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-        <hr class="border-secondary">
-
-        <div class="text-center">
-
-            © <?= date('Y') ?> FarmLink. All Rights Reserved.
-
-        </div>
-
-    </div>
+</div>
 
 </footer>
+
 <script src="<?= $base ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="<?= $base ?>/assets/js/theme.js"></script>
 <script src="/projects/farmlink/assets/js/preloader.js"></script>
 <script src="/projects/farmlink/assets/js/counter.js"></script>
+
 </body>
 </html>

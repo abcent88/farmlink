@@ -96,6 +96,25 @@ navLink(
     "bi bi-bar-chart-line"
 );
 
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Testimonials
+|--------------------------------------------------------------------------
+*/
+
+navLink(
+    '/projects/farmlink/admin/testimonials.php',
+    'Testimonials',
+    'bi bi-chat-square-quote'
+);
+navLink(
+    '/projects/farmlink/admin/website_settings.php',
+    'Website Settings',
+    'bi bi-gear-fill'
+);
 /*
 |--------------------------------------------------------------------------
 | Notifications

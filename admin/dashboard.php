@@ -891,7 +891,11 @@ QUICK ACTIONS
 
     </div>
 
-</div>
+    
+
+    </div>
+
+</div> <!-- closes container -->
 
 <br><br>
 

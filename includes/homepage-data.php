@@ -187,3 +187,25 @@ LIMIT 6
 ");
 
 $farmers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+/*
+|--------------------------------------------------------------------------
+| Approved Testimonials
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+SELECT
+    t.rating,
+    t.message,
+    u.fullname
+FROM testimonials t
+JOIN users u
+    ON u.id = t.user_id
+WHERE t.status = 'approved'
+ORDER BY t.created_at DESC
+LIMIT 6
+");
+
+$stmt->execute();
+
+$testimonials = $stmt->fetchAll(PDO::FETCH_ASSOC);

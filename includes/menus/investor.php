@@ -24,6 +24,13 @@ navLink(
     "bi bi-bell"
 );
 
+
+navLink(
+    "/projects/farmlink/testimonial.php",
+    "Share Experience",
+        "bi bi-star-fill me-1"
+        
+);
 navLink(
     "/projects/farmlink/logout.php",
     "Logout",
